@@ -49,3 +49,5 @@ jobs:
       with:
         command: test
         args: --profile release
+      env:
+        CORN_TEST: foobar
