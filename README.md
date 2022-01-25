@@ -31,10 +31,19 @@ cornfig file.corn -t yaml
 Corn can be used as a Rust library to deserialize config files directly
 without needing to convert to other file formats.
 
-TODO: Link to docs
+Rust docs can be found [here](https://docs.rs/cornfig/latest/cornfig/).
 
-```rs
-// TODO: Write example
+```rust
+use cornfig::parse;
+
+fn main() {
+    let corn = "{foo = 42}";
+
+    let config = parse(corn).unwrap();
+    let json = serde_json::to_string_pretty(&config.value).unwrap();
+
+    assert_eq!(json, "{\"foo\": 42}");
+}
 ```
 
 ## Writing Corn
@@ -120,7 +129,7 @@ There is no restriction on nesting objects within objects or arrays.
 The next key starts as soon as the previous value ends,
 meaning this is also valid without whitespace:
 
-TODO: Test the limits of this!!
+> TODO: Test the limits of this!!
 
 ```nix
 {foo="bar"hello="world"}
@@ -180,7 +189,7 @@ foo = null
 
 #### Inputs
 
-TODO: rename to 'inputs' in code
+> TODO: rename to 'inputs' in code
 
 Sometimes it may be useful to store some values at the top
 of the config file, and use or re-use them later on,
