@@ -1,0 +1,18 @@
+let {
+    $firstName = "John"
+    $lastName = "Smith"
+
+    $birthday = {
+        day = 1
+        month = 1
+        year = 1970
+    }
+
+} in {
+    name = {
+        first = $firstName
+        last = $lastName
+    }
+
+    dob = $birthday
+}

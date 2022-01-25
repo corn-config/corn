@@ -1,0 +1,56 @@
+let {
+  // variables go here
+  // they should start with a $ and use alphanumeric characters only
+  $firstName = "John"
+  $lastName = "Smith"
+  $age = 32
+  $employed = true
+  $jobName = "Postman"
+}
+in {
+  // here is another comment
+  name.first = $firstName
+  name.last = $lastName
+  name.full = "$firstName $lastName"
+  age = $age
+
+  employment = {
+     employed = $employed
+     name = $jobName
+  }
+
+  placeholder = null
+
+  // invalid = not_valid
+  // invalid.var = $not_valid
+
+  employment.sinceYear = 2019
+
+  parents.father.birthday = {
+    year = 1970
+    month = 2
+    day = 3
+  }
+
+  gender = "M"
+
+  favourites = [
+    "blue"
+    "fish"
+    "egg"
+    $jobName
+    4.73753
+    false
+    {
+        hello = "world"
+        food.favourite = "egg"
+        food.hated = "beef"
+    }
+  ]
+
+  empty1 = {}
+  empty2 = []
+
+  negative.int = -34
+  negative.float = -34.34
+}

@@ -1,0 +1,61 @@
+WHITESPACE = _{ " " | "\t" | "\r" | "\n" }
+COMMENT = _{ "//" ~ (!"\n" ~ ANY)* }
+
+object = {
+ "{" ~ pair* ~ "}"
+}
+
+array = {
+  "[" ~ value* ~ "]"
+}
+
+pair = { path ~ "=" ~ value }
+
+path = ${
+    path_char+
+    ~ ( "." ~ path_char+ )*
+}
+
+path_char = { ASCII_ALPHANUMERIC | "_" }
+
+value = _{ object | array | variable | string | float | integer | boolean | null }
+
+boolean = { "true" | "false" }
+null = { "null" }
+
+string = ${
+  "\"" ~ char* ~ "\"" |
+  "'" ~ char* ~ "'"
+}
+
+string_with_length = ${
+  "\"" ~ char+ ~ "\"" |
+  "'" ~ char+ ~ "'"
+}
+
+char = {
+//     variable
+    !("\"" | "\\") ~ ANY
+    | "\\" ~ ("\"" | "\\" | "/" | "b" | "f" | "n" | "r" | "t")
+    | "\\" ~ ("u" ~ ASCII_HEX_DIGIT{4})
+}
+
+integer = @{
+  "-"?
+  ~ ("0" | ASCII_NONZERO_DIGIT ~ ASCII_DIGIT*)
+}
+
+float = @{
+  "-"?
+  ~ ("0" | ASCII_NONZERO_DIGIT ~ ASCII_DIGIT*)
+  ~ ("." ~ ASCII_DIGIT*)
+  ~ (^"e" ~ ("+" | "-")? ~ ASCII_DIGIT+)?
+}
+
+variable = ${ "$" ~ (ASCII_ALPHA | "_") ~ (ASCII_ALPHANUMERIC | "_")+ }
+
+assignment = { variable ~ "=" ~ value }
+
+assign_block = { "let" ~ "{" ~ assignment* ~ "}" ~ "in" }
+
+config = _{ SOI ~ assign_block? ~ object ~ EOI }
