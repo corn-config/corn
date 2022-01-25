@@ -11,10 +11,10 @@ macro_rules! generate_eq_tests {
                 let test_name = stringify!($test_name);
 
                 let input = fs::read_to_string(format!("assets/inputs/{}.corn", test_name)).unwrap();
-                let output = fs::read_to_string(format!("assets/outputs/{}.json", test_name)).unwrap();
+                let output = fs::read_to_string(format!("assets/outputs/{}.json", test_name)).unwrap().replace("\r", "");
 
                 let config = parse(input.as_str()).unwrap();
-                let json = serde_json::to_string_pretty(&config.value).unwrap();
+                let json = serde_json::to_string_pretty(&config.value).unwrap().replace("\r", "");
 
                 assert_eq!(json, output);
             }
