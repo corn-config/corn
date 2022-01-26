@@ -4,12 +4,16 @@ use std::path::Path;
 
 use crate::Rule;
 
+/// Exit code for an error while parsing the file
 pub const ERR_PARSING: i32 = 1;
 /// Exit code for an error while referencing an input
 pub const ERR_INPUT: i32 = 2;
 /// Exit code for an error while reading the input file
 pub const ERR_FILE_READ: i32 = 3;
 
+/// Pretty-prints `message` to `stderr`.
+/// If `context` is supplied,
+/// it will be appended to the first line.
 pub fn print_err(message: String, context: Option<String>) {
     if let Some(context) = context {
         eprintln!("{} {}:", "An error occurred".red(), context.red());
@@ -20,6 +24,11 @@ pub fn print_err(message: String, context: Option<String>) {
     eprintln!("\t{}", message.red().bold());
 }
 
+/// Pretty prints a parser error,
+/// indicating where in the corn source code the error occurred
+/// and the rules the parser expected in that position.
+///
+/// The output is designed to mimic the Rust compiler output.
 pub fn print_parser_err(error: Error<Rule>, file: String, path: &Path) {
     let message = match error.variant {
         ErrorVariant::ParsingError {

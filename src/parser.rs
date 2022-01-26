@@ -63,6 +63,12 @@ fn parse_value<'a>(pair: Pair<'a, Rule>, inputs: &Inputs<'a>) -> Value<'a> {
     }
 }
 
+/// Adds `Value` at the `path` in `obj`.
+///
+/// `path` is an array where each entry represents another object key,
+/// for example `foo.bar` is represented as `["foo", "bar"]`.
+///
+/// Objects are automatically created up to the required depth recursively.
 fn add_at_path<'a>(
     mut obj: BTreeMap<&'a str, Value<'a>>,
     path: &[&'a str],
@@ -94,7 +100,10 @@ fn add_at_path<'a>(
     obj
 }
 
-fn parse_string<'a>(pair: Pair<'a, Rule>, variables: &Variables<'a>) -> String {
+/// Collects each `char` in a `Rule::string`
+/// to form a single `String`.
+fn parse_string(pair: Pair<Rule>) -> String {
+    assert_eq!(pair.as_rule(), Rule::string);
     pair.into_inner()
         .map(|char| {
             let value = char.as_str();
@@ -124,7 +133,12 @@ fn parse_array<'a>(block: Pair<'a, Rule>, inputs: &Inputs<'a>) -> Vec<Value<'a>>
         .collect::<Vec<_>>()
 }
 
-pub fn parse_object<'a>(
+/// Parses each key/value pair in a `Rule::object`
+/// to form a BTreeMap of Values.
+///
+/// A BTreeMap is used to ensure keys
+/// always output in the same order.
+fn parse_object<'a>(
     block: Pair<'a, Rule>,
     inputs: &Inputs<'a>,
 ) -> BTreeMap<&'a str, Value<'a>> {
@@ -166,6 +180,28 @@ fn parse_assign_block(block: Pair<Rule>) -> Inputs {
     inputs
 }
 
+/// Parses the input string into a `Config`
+/// containing the resolved inputs
+/// and a map of values representing the top-level object.
+///
+/// # Examples
+///
+/// ```rust
+/// use cornfig::parse;
+///
+/// let corn = "{foo = 42}";
+///
+/// let config = parse(corn).unwrap();
+/// let json = serde_json::to_string(&config.value).unwrap();
+///
+/// assert_eq!(json, "{\"foo\":42}");
+/// ```
+///
+/// # Errors
+///
+/// TODO: Write about errors after improving error handling
+///
+///
 pub fn parse(file: &str) -> Result<Config, Error<Rule>> {
     let rules = ConfigParser::parse(Rule::config, file);
 
