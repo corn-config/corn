@@ -1,7 +1,8 @@
 use serde::Serialize;
 use std::collections::{BTreeMap, HashMap};
 
-pub use crate::parser::{parse, Rule};
+pub use crate::parser::{parse};
+pub(crate) use crate::parser::Rule;
 
 pub mod error;
 mod parser;
