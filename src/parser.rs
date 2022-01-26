@@ -8,7 +8,7 @@ use pest::iterators::Pair;
 use pest::Parser;
 
 use crate::error::{print_err, ERR_INPUT};
-use crate::{Config, Value, Inputs};
+use crate::{Config, Inputs, Value};
 
 #[derive(pest_derive::Parser)]
 #[grammar = "grammar.pest"]
@@ -38,10 +38,7 @@ fn attempt_get_input<'a>(key: &'a str, inputs: &Inputs<'a>) -> Value<'a> {
         value.clone()
     } else {
         // TODO: Only print errors & exit from binary
-        print_err(
-            format!("Input `{}` was used but not declared", key),
-            None,
-        );
+        print_err(format!("Input `{}` was used but not declared", key), None);
         exit(ERR_INPUT);
     }
 }
@@ -128,10 +125,7 @@ fn parse_array<'a>(block: Pair<'a, Rule>, inputs: &Inputs<'a>) -> Vec<Value<'a>>
 ///
 /// A BTreeMap is used to ensure keys
 /// always output in the same order.
-fn parse_object<'a>(
-    block: Pair<'a, Rule>,
-    inputs: &Inputs<'a>,
-) -> BTreeMap<&'a str, Value<'a>> {
+fn parse_object<'a>(block: Pair<'a, Rule>, inputs: &Inputs<'a>) -> BTreeMap<&'a str, Value<'a>> {
     assert_eq!(block.as_rule(), Rule::object);
 
     let mut obj = BTreeMap::new();
