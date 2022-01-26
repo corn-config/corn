@@ -16,8 +16,10 @@ enum OutputType {
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 struct Args {
+    /// Path to the input corn file
     input: String,
 
+    /// The file format to output
     #[clap(long = "type", short = 't', arg_enum)]
     output_type: Option<OutputType>,
 }
@@ -61,6 +63,10 @@ fn main() {
     }
 }
 
+/// Gets the file type to use for the output.
+/// If the type arg is supplied, this is used.
+/// If not, the file extension is tried for a match.
+/// Finally, the output type falls back to JSON as the default.
 fn get_output_type(arg: Option<OutputType>, path: &Path) -> OutputType {
     if let Some(output_type) = arg {
         return output_type;
@@ -74,6 +80,7 @@ fn get_output_type(arg: Option<OutputType>, path: &Path) -> OutputType {
         return match extension {
             "json" => OutputType::Json,
             "yaml" => OutputType::Yaml,
+            "yml" => OutputType::Yaml,
             _ => OutputType::Json,
         };
     }
