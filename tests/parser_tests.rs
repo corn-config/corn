@@ -55,7 +55,8 @@ generate_eq_tests!(
     compact,
     very_compact,
     comment,
-    complex
+    complex,
+    readme_example
 );
 
 generate_invalid_tests!(invalid, invalid_input);

@@ -1,0 +1,25 @@
+let {
+    $entry = "dist/index.js"
+    $author = { name = "John smith" email = "mail@example.com" }
+} in {
+    name = "example-package"
+    version = "1.0.0"
+    main = $entry
+    bin.filebrowser = $entry
+    private = false
+
+    author = $author
+    author.url = "https://example.com"
+
+    contributors = [ $author ]
+
+    scripts.build = "tsc"
+    scripts.run = "node dist"
+
+    dependencies = {
+        dotenv = "^8.2.0"
+        // put the rest of your deps here...
+    }
+
+    devDependencies.typescript = "^4.5"
+}
