@@ -22,6 +22,22 @@ macro_rules! generate_eq_tests {
     }
 }
 
+macro_rules! generate_invalid_tests {
+    ($($test_name:ident),+) => {
+        $(
+            #[test]
+            fn $test_name() {
+                let test_name = stringify!($test_name);
+
+                let input = fs::read_to_string(format!("assets/inputs/{}.corn", test_name)).unwrap();
+
+                let config = parse(input.as_str());
+                assert!(config.is_err());
+            }
+        )+
+    }
+}
+
 generate_eq_tests!(
     basic,
     basic_empty_let,
@@ -42,10 +58,7 @@ generate_eq_tests!(
     complex
 );
 
-#[test]
-fn invalid() {
-    let input = fs::read_to_string("assets/inputs/invalid.corn").unwrap();
-
-    let config = parse(input.as_str());
-    assert!(config.is_err());
-}
+generate_invalid_tests!(
+    invalid,
+    invalid_input
+);
