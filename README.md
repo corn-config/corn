@@ -23,7 +23,10 @@ Unlike JSON or YAML or TOML, you cannot serialize code back into Corn.
 ### As a binary
 
 Corn can be installed as an executable binary to convert files from the `.corn` format
-into either `yaml` or `json`.
+into any supported output format. Currently these are:
+
+- JSON
+- YAML
 
 Windows, Linux and macOS are currently supported.
 
@@ -62,6 +65,8 @@ fn main() {
 
 ## Writing Corn
 
+> This section gives all the outputs in JSON format. Remember you can output in any supported format!
+
 All Corn files must contain a top-level object that contains keys/values.
 Keys must be alphanumeric and do not need quotes around them.
 Values must be one of the following:
@@ -90,6 +95,74 @@ Which of course maps to the following in JSON:
   "hello": "world"
 }
 ```
+
+A more complex example would be something like a `package.json`. 
+This makes use of inputs, various other data types and key chaining:
+
+```nix
+let {
+    $entry = "dist/index.js"
+    $author = { name = "John smith" email = "mail@example.com" }
+} in {
+    name = "example-package"
+    version = "1.0.0"
+    main = $entry
+    bin.filebrowser = $entry
+    private = false
+    
+    author = $author
+    author.url = "https://example.com" 
+    
+    contributors = [ $author ]
+    
+    scripts.build = "tsc"
+    scripts.run = "node dist"
+    
+    dependencies = {
+        dotenv = "^8.2.0"
+        // put the rest of your deps here...
+    }
+    
+    devDependencies.typescript = "^4.5"
+}
+```
+
+<details>
+<summary>This output's a bit longer than the others, so click here to expand it and have a look.</summary>
+
+```json
+{
+  "author": {
+    "email": "mail@example.com",
+    "name": "John smith",
+    "url": "https://example.com"
+  },
+  "bin": {
+    "filebrowser": "dist/index.js"
+  },
+  "contributors": [
+    {
+      "email": "mail@example.com",
+      "name": "John smith"
+    }
+  ],
+  "dependencies": {
+    "dotenv": "^8.2.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.5"
+  },
+  "main": "dist/index.js",
+  "name": "example-package",
+  "private": false,
+  "scripts": {
+    "build": "tsc",
+    "run": "node dist"
+  },
+  "version": "1.0.0"
+}
+```
+</details>
 
 ### Types
 
