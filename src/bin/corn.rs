@@ -1,7 +1,7 @@
-use cornfig::error::{format_parser_err, print_err, Error, FileReadError, ExitCode};
+use cornfig::error::{format_parser_err, print_err, Error, ExitCode, FileReadError};
 use cornfig::parse;
 use std::fs::read_to_string;
-use std::path::{Path};
+use std::path::Path;
 use std::process::exit;
 
 use clap::{ArgEnum, Parser};

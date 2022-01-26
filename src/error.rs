@@ -69,8 +69,10 @@ impl Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match self {
             Error::ParserError(_) => writeln!(f, "An error while parsing the input file."),
-            Error::InputResolveError(err) => write!(f, "Input `{}` was used but not declared", err.0),
-            Error::FileReadError(err) => write!(f, "{}", err.to_string())
+            Error::InputResolveError(err) => {
+                write!(f, "Input `{}` was used but not declared", err.0)
+            }
+            Error::FileReadError(err) => write!(f, "{}", err.to_string()),
         }
     }
 }
@@ -80,7 +82,7 @@ impl Error {
         match self {
             Error::ParserError(_) => InputResolveError::EXIT_CODE,
             Error::InputResolveError(_) => InputResolveError::EXIT_CODE,
-            Error::FileReadError(_) => InputResolveError::EXIT_CODE
+            Error::FileReadError(_) => InputResolveError::EXIT_CODE,
         }
     }
 }

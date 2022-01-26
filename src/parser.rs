@@ -42,10 +42,7 @@ fn get_input<'a>(key: &'a str, inputs: &Inputs<'a>) -> Result<Value<'a>> {
 }
 
 /// Parses a pair of `Rule`s into a `Value`.
-fn parse_value<'a>(
-    pair: Pair<'a, Rule>,
-    inputs: &Inputs<'a>,
-) -> Result<Value<'a>> {
+fn parse_value<'a>(pair: Pair<'a, Rule>, inputs: &Inputs<'a>) -> Result<Value<'a>> {
     match pair.as_rule() {
         Rule::object => Ok(Value::Object(parse_object(pair, inputs)?)),
         Rule::array => Ok(Value::Array(parse_array(pair, inputs)?)),
@@ -113,10 +110,7 @@ fn parse_string(pair: Pair<Rule>) -> String {
 
 /// Parses each rule in a `Rule::array`
 /// to form a vector of `Value`s.
-fn parse_array<'a>(
-    block: Pair<'a, Rule>,
-    inputs: &Inputs<'a>,
-) -> Result<Vec<Value<'a>>> {
+fn parse_array<'a>(block: Pair<'a, Rule>, inputs: &Inputs<'a>) -> Result<Vec<Value<'a>>> {
     assert_eq!(block.as_rule(), Rule::array);
     block
         .into_inner()

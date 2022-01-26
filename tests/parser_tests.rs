@@ -58,7 +58,4 @@ generate_eq_tests!(
     complex
 );
 
-generate_invalid_tests!(
-    invalid,
-    invalid_input
-);
+generate_invalid_tests!(invalid, invalid_input);
