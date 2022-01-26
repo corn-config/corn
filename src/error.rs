@@ -17,12 +17,6 @@ pub trait ExitCode {
     const EXIT_CODE: i32;
 }
 
-// impl fmt::Display for InputResolveError {
-//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-//         write!(f, "Input `{}` was used but not declared", self.0)
-//     }
-// }
-
 impl ExitCode for pest::error::Error<Rule> {
     const EXIT_CODE: i32 = 1;
 }
@@ -72,7 +66,7 @@ impl Display for Error {
             Error::InputResolveError(err) => {
                 write!(f, "Input `{}` was used but not declared", err.0)
             }
-            Error::FileReadError(err) => write!(f, "{}", err.to_string()),
+            Error::FileReadError(err) => write!(f, "{}", err),
         }
     }
 }
