@@ -1,7 +1,7 @@
-use cornfig::error::{print_err, print_parser_err, ERR_FILE_READ, ERR_PARSING};
+use cornfig::error::{format_parser_err, print_err, Error, FileReadError, ExitCode};
 use cornfig::parse;
 use std::fs::read_to_string;
-use std::path::Path;
+use std::path::{Path};
 use std::process::exit;
 
 use clap::{ArgEnum, Parser};
@@ -45,8 +45,15 @@ fn main() {
                     println!("{}", serialized);
                 }
                 Err(error) => {
-                    print_parser_err(error, unparsed_file, path);
-                    exit(ERR_PARSING);
+                    eprintln!("{}", error.to_string().red());
+
+                    let code = error.get_exit_code();
+
+                    if let Error::ParserError(err) = error {
+                        eprintln!("{}", format_parser_err(err, unparsed_file, path));
+                    };
+
+                    exit(code);
                 }
             };
         }
@@ -58,7 +65,7 @@ fn main() {
                     path.display().to_string().bold()
                 )),
             );
-            exit(ERR_FILE_READ);
+            exit(FileReadError::EXIT_CODE);
         }
     }
 }

@@ -1,13 +1,11 @@
 use std::collections::{BTreeMap, HashMap};
 use std::env;
 use std::fmt::Formatter;
-use std::process::exit;
 
-use pest::error::Error;
 use pest::iterators::Pair;
 use pest::Parser;
 
-use crate::error::{print_err, ERR_INPUT};
+use crate::error::{Error, InputResolveError, Result};
 use crate::{Config, Inputs, Value};
 
 #[derive(pest_derive::Parser)]
@@ -22,40 +20,43 @@ impl std::fmt::Display for Rule {
 
 /// Attempts to get an input value from the `inputs` map.
 /// If the `key` starts with `$env_` the system environment variables will be consulted first.
-fn attempt_get_input<'a>(key: &'a str, inputs: &Inputs<'a>) -> Value<'a> {
+fn get_input<'a>(key: &'a str, inputs: &Inputs<'a>) -> Result<Value<'a>> {
     if key.starts_with("$env_") {
         let env_name = key.replace("$env_", "");
         let pair = env::vars().find(|(key, _)| key == &env_name);
         if let Some(pair) = pair {
-            return Value::String(pair.1);
+            return Ok(Value::String(pair.1));
         }
     }
 
-    let value = inputs.get(key);
-
-    if let Some(value) = value {
+    if let Some(value) = inputs.get(key) {
         // TODO: Not clone
-        value.clone()
+        Ok(value.clone())
     } else {
+        Err(Error::InputResolveError(InputResolveError(key.to_string())))
+
         // TODO: Only print errors & exit from binary
-        print_err(format!("Input `{}` was used but not declared", key), None);
-        exit(ERR_INPUT);
+        // print_err(format!("Input `{}` was used but not declared", key), None);
+        // exit(ERR_INPUT);
     }
 }
 
 /// Parses a pair of `Rule`s into a `Value`.
-fn parse_value<'a>(pair: Pair<'a, Rule>, inputs: &Inputs<'a>) -> Value<'a> {
+fn parse_value<'a>(
+    pair: Pair<'a, Rule>,
+    inputs: &Inputs<'a>,
+) -> Result<Value<'a>> {
     match pair.as_rule() {
-        Rule::object => Value::Object(parse_object(pair, inputs)),
-        Rule::array => Value::Array(parse_array(pair, inputs)),
-        Rule::string => Value::String(parse_string(pair)),
-        Rule::integer => Value::Integer(pair.as_str().parse().unwrap()),
-        Rule::float => Value::Float(pair.as_str().parse().unwrap()),
-        Rule::boolean => Value::Boolean(pair.as_str().parse().unwrap()),
-        Rule::null => Value::Null,
+        Rule::object => Ok(Value::Object(parse_object(pair, inputs)?)),
+        Rule::array => Ok(Value::Array(parse_array(pair, inputs)?)),
+        Rule::string => Ok(Value::String(parse_string(pair))),
+        Rule::integer => Ok(Value::Integer(pair.as_str().parse().unwrap())),
+        Rule::float => Ok(Value::Float(pair.as_str().parse().unwrap())),
+        Rule::boolean => Ok(Value::Boolean(pair.as_str().parse().unwrap())),
+        Rule::null => Ok(Value::Null),
         Rule::input => {
             let key = pair.as_str();
-            attempt_get_input(key, inputs)
+            get_input(key, inputs)
         }
         _ => unreachable!(),
     }
@@ -112,12 +113,15 @@ fn parse_string(pair: Pair<Rule>) -> String {
 
 /// Parses each rule in a `Rule::array`
 /// to form a vector of `Value`s.
-fn parse_array<'a>(block: Pair<'a, Rule>, inputs: &Inputs<'a>) -> Vec<Value<'a>> {
+fn parse_array<'a>(
+    block: Pair<'a, Rule>,
+    inputs: &Inputs<'a>,
+) -> Result<Vec<Value<'a>>> {
     assert_eq!(block.as_rule(), Rule::array);
     block
         .into_inner()
         .map(|pair| parse_value(pair, inputs))
-        .collect::<Vec<_>>()
+        .collect::<Result<Vec<_>>>()
 }
 
 /// Parses each key/value pair in a `Rule::object`
@@ -125,7 +129,10 @@ fn parse_array<'a>(block: Pair<'a, Rule>, inputs: &Inputs<'a>) -> Vec<Value<'a>>
 ///
 /// A BTreeMap is used to ensure keys
 /// always output in the same order.
-fn parse_object<'a>(block: Pair<'a, Rule>, inputs: &Inputs<'a>) -> BTreeMap<&'a str, Value<'a>> {
+fn parse_object<'a>(
+    block: Pair<'a, Rule>,
+    inputs: &Inputs<'a>,
+) -> Result<BTreeMap<&'a str, Value<'a>>> {
     assert_eq!(block.as_rule(), Rule::object);
 
     let mut obj = BTreeMap::new();
@@ -135,7 +142,7 @@ fn parse_object<'a>(block: Pair<'a, Rule>, inputs: &Inputs<'a>) -> BTreeMap<&'a 
             Rule::pair => {
                 let mut path_rules = rule.into_inner();
                 let path = path_rules.next().unwrap().as_str();
-                let value = parse_value(path_rules.next().unwrap(), inputs);
+                let value = parse_value(path_rules.next().unwrap(), inputs)?;
 
                 obj = add_at_path(obj, path.split('.').collect::<Vec<_>>().as_slice(), value);
             }
@@ -143,12 +150,12 @@ fn parse_object<'a>(block: Pair<'a, Rule>, inputs: &Inputs<'a>) -> BTreeMap<&'a 
         }
     }
 
-    obj
+    Ok(obj)
 }
 
 /// Parses the `let { } in` block at the start of files,
 /// producing a populated HashMap as an output.
-fn parse_assign_block(block: Pair<Rule>) -> Inputs {
+fn parse_assign_block(block: Pair<Rule>) -> Result<Inputs> {
     assert_eq!(block.as_rule(), Rule::assign_block);
 
     let mut inputs = HashMap::new();
@@ -156,12 +163,12 @@ fn parse_assign_block(block: Pair<Rule>) -> Inputs {
     for pair in block.into_inner() {
         let mut assign_rules = pair.into_inner();
         let name = assign_rules.next().unwrap().as_str();
-        let value = parse_value(assign_rules.next().unwrap(), &inputs);
+        let value = parse_value(assign_rules.next().unwrap(), &inputs)?;
 
         inputs.insert(name, value);
     }
 
-    inputs
+    Ok(inputs)
 }
 
 /// Parses the input string into a `Config`
@@ -186,7 +193,7 @@ fn parse_assign_block(block: Pair<Rule>) -> Inputs {
 /// TODO: Write about errors after improving error handling
 ///
 ///
-pub fn parse(file: &str) -> Result<Config, Error<Rule>> {
+pub fn parse(file: &str) -> Result<Config> {
     let rules = ConfigParser::parse(Rule::config, file);
 
     match rules {
@@ -197,8 +204,8 @@ pub fn parse(file: &str) -> Result<Config, Error<Rule>> {
                 Rule::assign_block => {
                     let value_block = rules.next().unwrap();
 
-                    let inputs = parse_assign_block(first_block);
-                    let value_block = parse_object(value_block, &inputs);
+                    let inputs = parse_assign_block(first_block)?;
+                    let value_block = parse_object(value_block, &inputs)?;
 
                     Ok(Config {
                         inputs,
@@ -208,7 +215,7 @@ pub fn parse(file: &str) -> Result<Config, Error<Rule>> {
                 Rule::object => {
                     let inputs = HashMap::new();
 
-                    let value_block = parse_object(first_block, &inputs);
+                    let value_block = parse_object(first_block, &inputs)?;
 
                     Ok(Config {
                         inputs,
@@ -218,6 +225,6 @@ pub fn parse(file: &str) -> Result<Config, Error<Rule>> {
                 _ => unreachable!(),
             }
         }
-        Err(error) => Err(error),
+        Err(error) => Err(Error::ParserError(error)),
     }
 }

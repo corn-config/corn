@@ -1,15 +1,91 @@
 use colored::*;
-use pest::error::{Error, ErrorVariant, LineColLocation};
+use pest::error::{ErrorVariant, LineColLocation};
+use std::fmt::{Debug, Display, Formatter};
 use std::path::Path;
+use std::{fmt, io};
 
 use crate::Rule;
 
-/// Exit code for an error while parsing the file
-pub const ERR_PARSING: i32 = 1;
-/// Exit code for an error while referencing an input
-pub const ERR_INPUT: i32 = 2;
-/// Exit code for an error while reading the input file
-pub const ERR_FILE_READ: i32 = 3;
+type PestError = pest::error::Error<Rule>;
+
+#[derive(Debug)]
+pub struct InputResolveError(pub String);
+#[derive(Debug)]
+pub struct FileReadError(pub String);
+
+pub trait ExitCode {
+    const EXIT_CODE: i32;
+}
+
+// impl fmt::Display for InputResolveError {
+//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+//         write!(f, "Input `{}` was used but not declared", self.0)
+//     }
+// }
+
+impl ExitCode for pest::error::Error<Rule> {
+    const EXIT_CODE: i32 = 1;
+}
+
+impl ExitCode for InputResolveError {
+    const EXIT_CODE: i32 = 2;
+}
+
+impl ExitCode for FileReadError {
+    const EXIT_CODE: i32 = 3;
+}
+
+#[derive(Debug)]
+pub enum Error {
+    /// Error while parsing the file
+    ParserError(pest::error::Error<Rule>),
+    /// Error while looking up a referenced an input
+    InputResolveError(InputResolveError),
+    /// Error while reading the input file from disk
+    FileReadError(io::Error),
+}
+
+impl std::error::Error for Error {}
+
+impl From<InputResolveError> for Error {
+    fn from(err: InputResolveError) -> Self {
+        Self::InputResolveError(err)
+    }
+}
+
+impl From<pest::error::Error<Rule>> for Error {
+    fn from(err: pest::error::Error<Rule>) -> Self {
+        Self::ParserError(err)
+    }
+}
+
+impl From<io::Error> for Error {
+    fn from(err: io::Error) -> Self {
+        Self::FileReadError(err)
+    }
+}
+
+impl Display for Error {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        match self {
+            Error::ParserError(_) => writeln!(f, "An error while parsing the input file."),
+            Error::InputResolveError(err) => write!(f, "Input `{}` was used but not declared", err.0),
+            Error::FileReadError(err) => write!(f, "{}", err.to_string())
+        }
+    }
+}
+
+impl Error {
+    pub fn get_exit_code(&self) -> i32 {
+        match self {
+            Error::ParserError(_) => InputResolveError::EXIT_CODE,
+            Error::InputResolveError(_) => InputResolveError::EXIT_CODE,
+            Error::FileReadError(_) => InputResolveError::EXIT_CODE
+        }
+    }
+}
+
+pub type Result<T> = std::result::Result<T, Error>;
 
 /// Pretty-prints `message` to `stderr`.
 /// If `context` is supplied,
@@ -29,14 +105,14 @@ pub fn print_err(message: String, context: Option<String>) {
 /// and the rules the parser expected in that position.
 ///
 /// The output is designed to mimic the Rust compiler output.
-pub fn print_parser_err(error: Error<Rule>, file: String, path: &Path) {
+pub fn format_parser_err(error: PestError, file: String, path: &Path) -> String {
     let message = match error.variant {
         ErrorVariant::ParsingError {
             positives,
             negatives: _negatives,
         } => {
             format!(
-                "Error found while parsing file.\nExpected one of:\n\t{}",
+                "Expected one of:\n\t{}",
                 positives
                     .iter()
                     .map(|rule| rule.to_string())
@@ -68,10 +144,19 @@ pub fn print_parser_err(error: Error<Rule>, file: String, path: &Path) {
 
     let bar = "  | ".blue();
 
-    eprintln!("--> {}:{}:{}", path.display(), pos.0 .0, pos.0 .1);
-    eprintln!("{}", bar);
-    eprintln!("{}{}", bar, line.red());
-    eprintln!("{}{}", bar, underline.red());
-    eprintln!("{}", bar);
-    eprintln!("{}", message);
+    format!(
+        "--> {path}:{start_pos}:{end_pos}\n\
+        {bar}\n\
+        {bar}{line}\n\
+        {bar}{underline}\n\
+        {bar}\n\
+        {message}",
+        bar = bar,
+        path = path.display(),
+        start_pos = pos.0 .0,
+        end_pos = pos.0 .1,
+        line = line,
+        underline = underline,
+        message = message
+    )
 }
