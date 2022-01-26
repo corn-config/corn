@@ -37,6 +37,7 @@ generate_eq_tests!(
     chained,
     chained_complex,
     compact,
+    very_compact,
     comment,
     complex
 );

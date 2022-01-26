@@ -1,1 +1,15 @@
-{foo="bar"bar="foo"}
+{
+    one={foo="bar"bar="foo"}
+    two={foo=1bar=2}
+    three={foo=1.0bar=2.0}
+    four={foo=truebar=false}
+    five={foo=nullbar=null}
+    six={foo={}bar={}}
+    seven={foo=[]bar=[]}
+
+    eight=["foo""bar"]
+    nine=[truefalse]
+    ten=[nullnull]
+    eleven=[[][]]
+    twelve=[{}{}]
+}
