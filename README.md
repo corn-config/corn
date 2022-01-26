@@ -59,7 +59,7 @@ Values must be one of the following:
 - Object
 - Array
 - Null
-- Variable
+- Input
 
 A very basic example therefore would be:
 
@@ -188,8 +188,6 @@ foo = null
 ```
 
 #### Inputs
-
-> TODO: rename to 'inputs' in code
 
 Sometimes it may be useful to store some values at the top
 of the config file, and use or re-use them later on,

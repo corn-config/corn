@@ -18,7 +18,7 @@ path = ${
 
 path_char = { ASCII_ALPHANUMERIC | "_" }
 
-value = _{ object | array | variable | string | float | integer | boolean | null }
+value = _{ object | array | input | string | float | integer | boolean | null }
 
 boolean = { "true" | "false" }
 null = { "null" }
@@ -34,7 +34,7 @@ string_with_length = ${
 }
 
 char = {
-//     variable
+//     input
     !("\"" | "\\") ~ ANY
     | "\\" ~ ("\"" | "\\" | "/" | "b" | "f" | "n" | "r" | "t")
     | "\\" ~ ("u" ~ ASCII_HEX_DIGIT{4})
@@ -52,9 +52,9 @@ float = @{
   ~ (^"e" ~ ("+" | "-")? ~ ASCII_DIGIT+)?
 }
 
-variable = ${ "$" ~ (ASCII_ALPHA | "_") ~ (ASCII_ALPHANUMERIC | "_")+ }
+input = ${ "$" ~ (ASCII_ALPHA | "_") ~ (ASCII_ALPHANUMERIC | "_")+ }
 
-assignment = { variable ~ "=" ~ value }
+assignment = { input ~ "=" ~ value }
 
 assign_block = { "let" ~ "{" ~ assignment* ~ "}" ~ "in" }
 

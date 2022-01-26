@@ -1,5 +1,5 @@
 let {
-  // variables go here
+  // inputs go here
   // they should start with a $ and use alphanumeric characters only
   $firstName = "John"
   $lastName = "Smith"

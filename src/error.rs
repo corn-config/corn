@@ -5,7 +5,9 @@ use std::path::Path;
 use crate::Rule;
 
 pub const ERR_PARSING: i32 = 1;
-pub const ERR_VARIABLE: i32 = 2;
+/// Exit code for an error while referencing an input
+pub const ERR_INPUT: i32 = 2;
+/// Exit code for an error while reading the input file
 pub const ERR_FILE_READ: i32 = 3;
 
 pub fn print_err(message: String, context: Option<String>) {

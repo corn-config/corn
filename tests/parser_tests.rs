@@ -32,7 +32,7 @@ generate_eq_tests!(
     null,
     object,
     array,
-    variable,
+    input,
     environment_variable,
     chained,
     chained_complex,

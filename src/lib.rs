@@ -6,7 +6,9 @@ pub use crate::parser::{parse, Rule};
 pub mod error;
 mod parser;
 
-pub type Variables<'a> = HashMap<&'a str, Value<'a>>;
+/// A map of input names and values.
+/// The names include their `$` prefix.
+pub type Inputs<'a> = HashMap<&'a str, Value<'a>>;
 
 #[derive(Serialize, Debug, Clone)]
 #[serde(untagged)]
@@ -22,6 +24,6 @@ pub enum Value<'a> {
 
 #[derive(Serialize, Debug)]
 pub struct Config<'a> {
-    pub variables: Variables<'a>,
+    pub inputs: Inputs<'a>,
     pub value: BTreeMap<&'a str, Value<'a>>,
 }

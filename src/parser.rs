@@ -7,8 +7,8 @@ use pest::error::Error;
 use pest::iterators::Pair;
 use pest::Parser;
 
-use crate::error::{print_err, ERR_VARIABLE};
-use crate::{Config, Value, Variables};
+use crate::error::{print_err, ERR_INPUT};
+use crate::{Config, Value, Inputs};
 
 #[derive(pest_derive::Parser)]
 #[grammar = "grammar.pest"]
@@ -20,7 +20,9 @@ impl std::fmt::Display for Rule {
     }
 }
 
-fn attempt_get_variable<'a>(key: &'a str, variables: &Variables<'a>) -> Value<'a> {
+/// Attempts to get an input value from the `inputs` map.
+/// If the `key` starts with `$env_` the system environment variables will be consulted first.
+fn attempt_get_input<'a>(key: &'a str, inputs: &Inputs<'a>) -> Value<'a> {
     if key.starts_with("$env_") {
         let env_name = key.replace("$env_", "");
         let pair = env::vars().find(|(key, _)| key == &env_name);
@@ -29,32 +31,33 @@ fn attempt_get_variable<'a>(key: &'a str, variables: &Variables<'a>) -> Value<'a
         }
     }
 
-    let value = variables.get(key);
+    let value = inputs.get(key);
 
     if let Some(value) = value {
         value.clone()
     } else {
         // TODO: Only print errors & exit from binary
         print_err(
-            format!("Variable `{}` was used but not declared", key),
+            format!("Input `{}` was used but not declared", key),
             None,
         );
-        exit(ERR_VARIABLE);
+        exit(ERR_INPUT);
     }
 }
 
-fn parse_value<'a>(pair: Pair<'a, Rule>, variables: &Variables<'a>) -> Value<'a> {
+/// Parses a pair of `Rule`s into a `Value`.
+fn parse_value<'a>(pair: Pair<'a, Rule>, inputs: &Inputs<'a>) -> Value<'a> {
     match pair.as_rule() {
-        Rule::object => Value::Object(parse_object(pair, variables)),
-        Rule::array => Value::Array(parse_array(pair, variables)),
-        Rule::string => Value::String(parse_string(pair, variables)),
+        Rule::object => Value::Object(parse_object(pair, inputs)),
+        Rule::array => Value::Array(parse_array(pair, inputs)),
+        Rule::string => Value::String(parse_string(pair)),
         Rule::integer => Value::Integer(pair.as_str().parse().unwrap()),
         Rule::float => Value::Float(pair.as_str().parse().unwrap()),
         Rule::boolean => Value::Boolean(pair.as_str().parse().unwrap()),
         Rule::null => Value::Null,
-        Rule::variable => {
+        Rule::input => {
             let key = pair.as_str();
-            attempt_get_variable(key, variables)
+            attempt_get_input(key, inputs)
         }
         _ => unreachable!(),
     }
@@ -111,17 +114,19 @@ fn parse_string<'a>(pair: Pair<'a, Rule>, variables: &Variables<'a>) -> String {
         .collect::<String>()
 }
 
-fn parse_array<'a>(block: Pair<'a, Rule>, variables: &Variables<'a>) -> Vec<Value<'a>> {
+/// Parses each rule in a `Rule::array`
+/// to form a vector of `Value`s.
+fn parse_array<'a>(block: Pair<'a, Rule>, inputs: &Inputs<'a>) -> Vec<Value<'a>> {
     assert_eq!(block.as_rule(), Rule::array);
     block
         .into_inner()
-        .map(|pair| parse_value(pair, variables))
+        .map(|pair| parse_value(pair, inputs))
         .collect::<Vec<_>>()
 }
 
 pub fn parse_object<'a>(
     block: Pair<'a, Rule>,
-    variables: &Variables<'a>,
+    inputs: &Inputs<'a>,
 ) -> BTreeMap<&'a str, Value<'a>> {
     assert_eq!(block.as_rule(), Rule::object);
 
@@ -132,7 +137,7 @@ pub fn parse_object<'a>(
             Rule::pair => {
                 let mut path_rules = rule.into_inner();
                 let path = path_rules.next().unwrap().as_str();
-                let value = parse_value(path_rules.next().unwrap(), variables);
+                let value = parse_value(path_rules.next().unwrap(), inputs);
 
                 obj = add_at_path(obj, path.split('.').collect::<Vec<_>>().as_slice(), value);
             }
@@ -143,20 +148,22 @@ pub fn parse_object<'a>(
     obj
 }
 
-pub fn parse_assign_block(block: Pair<Rule>) -> Variables {
+/// Parses the `let { } in` block at the start of files,
+/// producing a populated HashMap as an output.
+fn parse_assign_block(block: Pair<Rule>) -> Inputs {
     assert_eq!(block.as_rule(), Rule::assign_block);
 
-    let mut variables = HashMap::new();
+    let mut inputs = HashMap::new();
 
     for pair in block.into_inner() {
         let mut assign_rules = pair.into_inner();
         let name = assign_rules.next().unwrap().as_str();
-        let value = parse_value(assign_rules.next().unwrap(), &variables);
+        let value = parse_value(assign_rules.next().unwrap(), &inputs);
 
-        variables.insert(name, value);
+        inputs.insert(name, value);
     }
 
-    variables
+    inputs
 }
 
 pub fn parse(file: &str) -> Result<Config, Error<Rule>> {
@@ -170,21 +177,21 @@ pub fn parse(file: &str) -> Result<Config, Error<Rule>> {
                 Rule::assign_block => {
                     let value_block = rules.next().unwrap();
 
-                    let variables = parse_assign_block(first_block);
-                    let value_block = parse_object(value_block, &variables);
+                    let inputs = parse_assign_block(first_block);
+                    let value_block = parse_object(value_block, &inputs);
 
                     Ok(Config {
-                        variables,
+                        inputs,
                         value: value_block,
                     })
                 }
                 Rule::object => {
-                    let variables = HashMap::new();
+                    let inputs = HashMap::new();
 
-                    let value_block = parse_object(first_block, &variables);
+                    let value_block = parse_object(first_block, &inputs);
 
                     Ok(Config {
-                        variables,
+                        inputs,
                         value: value_block,
                     })
                 }
