@@ -13,6 +13,8 @@ small enough you can learn it in minutes.
 Corn can be installed as an executable binary to convert files from the `.corn` format
 into either `yaml` or `json`.
 
+Windows, Linux and macOS are currently supported.
+
 Install it using cargo:
 
 ```shell
@@ -124,15 +126,6 @@ There is no restriction on nesting objects within objects or arrays.
   foo = "bar"
   hello = "world"
 }
-```
-
-The next key starts as soon as the previous value ends,
-meaning this is also valid without whitespace:
-
-> TODO: Test the limits of this!!
-
-```nix
-{foo="bar"hello="world"}
 ```
 
 #### Array
@@ -319,7 +312,43 @@ JSON:
 }
 ```
 
+### Whitespace
+
+Almost all whitespace in Corn is optional, since keywords and types end as soon as they end. 
+There are only a few exceptions to this:
+
+- An integer or float following an integer or float must be whitespace separated to tell where one ends and the next starts.
+- References to inputs must terminate with whitespace as otherwise the parser cannot tell where the name ends.
+
+This means the below is perfectly valid (although for general consistency and readability this is strongly not recommended):
+
+```nix
+{
+    one={foo="bar"bar="foo"}
+    two={foo=1bar=2}
+    three={foo=1.0bar=2.0}
+    four={foo=truebar=false}
+    five={foo=nullbar=null}
+    six={foo={}bar={}}
+    seven={foo=[]bar=[]}
+
+    eight=["foo""bar"]
+    nine=[truefalse]
+    ten=[nullnull]
+    eleven=[[][]]
+    twelve=[{}{}]
+}
+```
+
+And in fact, we could even go as far as to reduce that to a single line:
+
+```nix
+{one={foo="bar"bar="foo"}two={foo=1bar=2}three={foo=1.0bar=2.0}four={foo=truebar=false}five={foo=nullbar=null}six={foo={}bar={}}seven={foo=[]bar=[]}eight=["foo""bar"]nine=[truefalse]ten=[nullnull]eleven=[[][]]twelve=[{}{}]}
+```
+
 ## Contributing
+
+Contributions are very welcome, although please do open an issue first as not every potential feature will get merged.
 
 ### Testing
 
