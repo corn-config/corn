@@ -2,9 +2,21 @@
 
 A simple and pain-free configuration language.
 
-Corn has been designed using inspiration from JSON and Nix to produce a language
+Corn has been designed using inspiration from JSON, TOML and Nix to produce a language
 that's easy and intuitive to write, good for config files, and has a feature-set
-small enough you can learn it in minutes.
+small enough you can learn it in minutes. It was born out of the following frustrations:
+
+- JSON is not a config language, despite how often people use it as one
+- TOML is good for flat structures but gets ugly quickly with deeper objects
+- YAML is far too complex and its whitespace rules make it error-prone
+
+## What Corn Is Not
+
+Corn is not a full programming language and does not try to be. 
+There are no variables, there is no interpolation and there are no statement blocks.
+
+Likewise, Corn is not a data exchange format. 
+Unlike JSON or YAML or TOML, you cannot serialize code back into Corn. 
 
 ## Usage
 
@@ -350,6 +362,13 @@ And in fact, we could even go as far as to reduce that to a single line:
 
 Contributions are very welcome, although please do open an issue first as not every potential feature will get merged.
 
-### Testing
+At the moment Corn is in very early stages. If you'd like to help out, I'd absolutely love to see the following:
 
-You must have set `CORN_TEST=foobar` as this is required for the environment variable tests.
+- More output formats
+- Improvements and fixes to existing features
+- More tests
+- Better documentation
+
+### Running Tests
+
+You must set `CORN_TEST=foobar` as this is required for the environment variable tests.
