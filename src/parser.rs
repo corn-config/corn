@@ -34,6 +34,7 @@ fn attempt_get_input<'a>(key: &'a str, inputs: &Inputs<'a>) -> Value<'a> {
     let value = inputs.get(key);
 
     if let Some(value) = value {
+        // TODO: Not clone
         value.clone()
     } else {
         // TODO: Only print errors & exit from binary
@@ -107,18 +108,7 @@ fn parse_string(pair: Pair<Rule>) -> String {
     pair.into_inner()
         .map(|char| {
             let value = char.as_str();
-            return if value.len() == 1 {
-                value.to_string()
-            } else {
-                let value = parse_value(char.into_inner().next().unwrap(), variables);
-                match value {
-                    Value::String(val) => val,
-                    Value::Integer(val) => val.to_string(),
-                    Value::Float(val) => val.to_string(),
-                    Value::Boolean(val) => val.to_string(),
-                    _ => unimplemented!(),
-                }
-            };
+            value.to_string()
         })
         .collect::<String>()
 }
