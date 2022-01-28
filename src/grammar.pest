@@ -24,13 +24,7 @@ boolean = { "true" | "false" }
 null = { "null" }
 
 string = ${
-  "\"" ~ char* ~ "\"" |
-  "'" ~ char* ~ "'"
-}
-
-string_with_length = ${
-  "\"" ~ char+ ~ "\"" |
-  "'" ~ char+ ~ "'"
+  "\"" ~ char* ~ "\""
 }
 
 char = {
