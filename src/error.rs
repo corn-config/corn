@@ -31,7 +31,7 @@ impl ExitCode for FileReadError {
     const EXIT_CODE: i32 = 3;
 }
 
-impl ExitCode for SerializationError  {
+impl ExitCode for SerializationError {
     const EXIT_CODE: i32 = 4;
 }
 
@@ -44,7 +44,7 @@ pub enum Error {
     /// Error while reading the input file from disk
     FileReadError(io::Error),
     /// Error when serializing output
-    SerializationError(String)
+    SerializationError(String),
 }
 
 impl std::error::Error for Error {}
@@ -93,7 +93,11 @@ impl Display for Error {
                 write!(f, "Input `{}` was used but not declared", err.0)
             }
             Error::FileReadError(err) => write!(f, "{}", err),
-            Error::SerializationError(err) => write!(f, "The input could not be serialized into the requested output format:\n\t{}", err)
+            Error::SerializationError(err) => write!(
+                f,
+                "The input could not be serialized into the requested output format:\n\t{}",
+                err
+            ),
         }
     }
 }
@@ -104,7 +108,7 @@ impl Error {
             Error::ParserError(_) => pest::error::Error::EXIT_CODE,
             Error::InputResolveError(_) => InputResolveError::EXIT_CODE,
             Error::FileReadError(_) => FileReadError::EXIT_CODE,
-            Error::SerializationError(_) => SerializationError::EXIT_CODE
+            Error::SerializationError(_) => SerializationError::EXIT_CODE,
         }
     }
 }
