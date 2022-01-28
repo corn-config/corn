@@ -33,7 +33,7 @@ fn main() {
 
     match unparsed_file {
         Ok(unparsed_file) => {
-            let output_type = get_output_type(args.output_type, path);
+            let output_type = get_output_type(args.output_type);
 
             match parse(&unparsed_file) {
                 Ok(config) => match serialize(config, output_type) {
@@ -58,24 +58,10 @@ fn main() {
 
 /// Gets the file type to use for the output.
 /// If the type arg is supplied, this is used.
-/// If not, the file extension is tried for a match.
-/// Finally, the output type falls back to JSON as the default.
-fn get_output_type(arg: Option<OutputType>, path: &Path) -> OutputType {
+/// Otherwise, the output type falls back to JSON as the default.
+fn get_output_type(arg: Option<OutputType>) -> OutputType {
     if let Some(output_type) = arg {
         return output_type;
-    }
-
-    if let Some(extension) = path.extension() {
-        let extension = extension
-            .to_str()
-            .expect("Input path contained unsupported characters");
-
-        return match extension {
-            "json" => OutputType::Json,
-            "yaml" => OutputType::Yaml,
-            "yml" => OutputType::Yaml,
-            _ => OutputType::Json,
-        };
     }
 
     OutputType::Json
