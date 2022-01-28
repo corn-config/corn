@@ -50,7 +50,7 @@ fn parse_value<'a>(pair: Pair<'a, Rule>, inputs: &Inputs<'a>) -> Result<Value<'a
         Rule::integer => Ok(Value::Integer(pair.as_str().parse().unwrap())),
         Rule::float => Ok(Value::Float(pair.as_str().parse().unwrap())),
         Rule::boolean => Ok(Value::Boolean(pair.as_str().parse().unwrap())),
-        Rule::null => Ok(Value::Null),
+        Rule::null => Ok(Value::Null(None)),
         Rule::input => {
             let key = pair.as_str();
             get_input(key, inputs)
@@ -203,7 +203,7 @@ pub fn parse(file: &str) -> Result<Config> {
 
                     Ok(Config {
                         inputs,
-                        value: value_block,
+                        value: Value::Object(value_block),
                     })
                 }
                 Rule::object => {
@@ -213,7 +213,7 @@ pub fn parse(file: &str) -> Result<Config> {
 
                     Ok(Config {
                         inputs,
-                        value: value_block,
+                        value: Value::Object(value_block),
                     })
                 }
                 _ => unreachable!(),

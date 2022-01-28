@@ -1,5 +1,5 @@
-use cornfig::error::{format_parser_err, print_err, Error, ExitCode, FileReadError};
-use cornfig::parse;
+use cornfig::error::{format_parser_err, print_err, Error, ExitCode, FileReadError, Result};
+use cornfig::{parse, Config, TomlValue};
 use std::fs::read_to_string;
 use std::path::Path;
 use std::process::exit;
@@ -11,6 +11,7 @@ use colored::*;
 enum OutputType {
     Json,
     Yaml,
+    Toml,
 }
 
 #[derive(Parser, Debug)]
@@ -65,6 +66,33 @@ fn get_output_type(arg: Option<OutputType>) -> OutputType {
     }
 
     OutputType::Json
+}
+
+fn serialize(config: Config, output_type: OutputType) -> Result<String> {
+    match output_type {
+        OutputType::Json => {
+            let res = serde_json::to_string_pretty(&config.value);
+            match res {
+                Ok(str) => Ok(str),
+                Err(err) => Err(Error::SerializationError(err.to_string())),
+            }
+        }
+        OutputType::Yaml => {
+            let res = serde_yaml::to_string(&config.value);
+            match res {
+                Ok(str) => Ok(str),
+                Err(err) => Err(Error::SerializationError(err.to_string())),
+            }
+        }
+        OutputType::Toml => {
+            let toml_value = TomlValue::from(config.value);
+            let res = toml::to_string_pretty(&toml_value);
+            match res {
+                Ok(str) => Ok(str),
+                Err(err) => Err(Error::SerializationError(err.to_string())),
+            }
+        }
+    }
 }
 
 fn handle_err(error: Error, unparsed_file: String, path: &Path) {
