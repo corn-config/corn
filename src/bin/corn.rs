@@ -36,25 +36,11 @@ fn main() {
             let output_type = get_output_type(args.output_type, path);
 
             match parse(&unparsed_file) {
-                Ok(config) => {
-                    let serialized = match output_type {
-                        OutputType::Json => serde_json::to_string_pretty(&config.value).unwrap(),
-                        OutputType::Yaml => serde_yaml::to_string(&config.value).unwrap(),
-                    };
-
-                    println!("{}", serialized);
-                }
-                Err(error) => {
-                    eprintln!("{}", error.to_string().red());
-
-                    let code = error.get_exit_code();
-
-                    if let Error::ParserError(err) = error {
-                        eprintln!("{}", format_parser_err(err, unparsed_file, path));
-                    };
-
-                    exit(code);
-                }
+                Ok(config) => match serialize(config, output_type) {
+                    Ok(serialized) => println!("{}", serialized),
+                    Err(err) => handle_err(err, unparsed_file, path),
+                },
+                Err(err) => handle_err(err, unparsed_file, path),
             };
         }
         Err(err) => {
@@ -93,4 +79,17 @@ fn get_output_type(arg: Option<OutputType>, path: &Path) -> OutputType {
     }
 
     OutputType::Json
+}
+
+fn handle_err(error: Error, unparsed_file: String, path: &Path) {
+    let code = error.get_exit_code();
+    let code_formatted = format!("[E{:0>4}]", code).red();
+
+    eprintln!("{} {}", code_formatted, error.to_string().bright_red());
+
+    if let Error::ParserError(err) = error {
+        eprintln!("{}", format_parser_err(err, unparsed_file, path));
+    };
+
+    exit(code);
 }

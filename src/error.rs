@@ -12,6 +12,8 @@ type PestError = pest::error::Error<Rule>;
 pub struct InputResolveError(pub String);
 #[derive(Debug)]
 pub struct FileReadError(pub String);
+#[derive(Debug)]
+pub struct SerializationError(pub String);
 
 pub trait ExitCode {
     const EXIT_CODE: i32;
@@ -29,6 +31,10 @@ impl ExitCode for FileReadError {
     const EXIT_CODE: i32 = 3;
 }
 
+impl ExitCode for SerializationError  {
+    const EXIT_CODE: i32 = 4;
+}
+
 #[derive(Debug)]
 pub enum Error {
     /// Error while parsing the file
@@ -37,6 +43,8 @@ pub enum Error {
     InputResolveError(InputResolveError),
     /// Error while reading the input file from disk
     FileReadError(io::Error),
+    /// Error when serializing output
+    SerializationError(String)
 }
 
 impl std::error::Error for Error {}
@@ -59,6 +67,24 @@ impl From<io::Error> for Error {
     }
 }
 
+impl From<serde_json::Error> for Error {
+    fn from(err: serde_json::Error) -> Self {
+        Self::SerializationError(err.to_string())
+    }
+}
+
+impl From<serde_yaml::Error> for Error {
+    fn from(err: serde_yaml::Error) -> Self {
+        Self::SerializationError(err.to_string())
+    }
+}
+
+impl From<toml::ser::Error> for Error {
+    fn from(err: toml::ser::Error) -> Self {
+        Self::SerializationError(err.to_string())
+    }
+}
+
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match self {
@@ -67,6 +93,7 @@ impl Display for Error {
                 write!(f, "Input `{}` was used but not declared", err.0)
             }
             Error::FileReadError(err) => write!(f, "{}", err),
+            Error::SerializationError(err) => write!(f, "The input could not be serialized into the requested output format:\n\t{}", err)
         }
     }
 }
@@ -74,9 +101,10 @@ impl Display for Error {
 impl Error {
     pub fn get_exit_code(&self) -> i32 {
         match self {
-            Error::ParserError(_) => InputResolveError::EXIT_CODE,
+            Error::ParserError(_) => pest::error::Error::EXIT_CODE,
             Error::InputResolveError(_) => InputResolveError::EXIT_CODE,
-            Error::FileReadError(_) => InputResolveError::EXIT_CODE,
+            Error::FileReadError(_) => FileReadError::EXIT_CODE,
+            Error::SerializationError(_) => SerializationError::EXIT_CODE
         }
     }
 }
