@@ -1,0 +1,9 @@
+---
+foo:
+  bar:
+    baz: 42
+  quux:
+    - green eggs
+    - ham
+  qux: true
+

@@ -1,0 +1,9 @@
+[foo]
+qux = true
+quux = [
+    'green eggs',
+    'ham',
+]
+
+[foo.bar]
+baz = 42

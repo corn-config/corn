@@ -1,0 +1,35 @@
+---
+age: 32
+employment:
+  employed: true
+  name: Postman
+  sinceYear: 2019
+empty1: {}
+empty2: []
+favourites:
+  - blue
+  - fish
+  - egg
+  - Postman
+  - 4.73753
+  - false
+  - food:
+      favourite: egg
+      hated: beef
+    hello: world
+gender: M
+name:
+  first: John
+  full: $firstName $lastName
+  last: Smith
+negative:
+  float: -34.34
+  int: -34
+parents:
+  father:
+    birthday:
+      day: 3
+      month: 2
+      year: 1970
+placeholder: ~
+

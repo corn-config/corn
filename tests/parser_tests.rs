@@ -1,23 +1,55 @@
 extern crate core;
 
-use cornfig::parse;
+use cornfig::{parse, TomlValue};
+use paste::paste;
 use std::fs;
 
 macro_rules! generate_eq_tests {
     ($($test_name:ident),+) => {
         $(
-            #[test]
-            fn $test_name() {
-                let test_name = stringify!($test_name);
+            paste!{
+                #[test]
+                fn [<json_ $test_name>]() {
+                    let test_name = stringify!($test_name);
 
-                let input = fs::read_to_string(format!("assets/inputs/{}.corn", test_name)).unwrap();
-                let output = fs::read_to_string(format!("assets/outputs/{}.json", test_name)).unwrap().replace("\r", "");
+                    let input = fs::read_to_string(format!("assets/inputs/{}.corn", test_name)).unwrap();
+                    let valid = fs::read_to_string(format!("assets/outputs/json/{}.json", test_name)).unwrap().replace("\r", "");
 
-                let config = parse(input.as_str()).unwrap();
-                let json = serde_json::to_string_pretty(&config.value).unwrap().replace("\r", "");
+                    let config = parse(input.as_str()).unwrap();
+                    let serialized = serde_json::to_string_pretty(&config.value).unwrap().replace("\r", "");
 
-                assert_eq!(json, output);
+                    assert_eq!(serialized.trim(), valid.trim());
+                }
+
+                #[test]
+                fn [<yaml_ $test_name>]() {
+                    let test_name = stringify!($test_name);
+
+                    let input = fs::read_to_string(format!("assets/inputs/{}.corn", test_name)).unwrap();
+                    let valid = fs::read_to_string(format!("assets/outputs/yaml/{}.yml", test_name)).unwrap().replace("\r", "");
+
+                    let config = parse(input.as_str()).unwrap();
+                    let serialized = serde_yaml::to_string(&config.value).unwrap().replace("\r", "");
+
+                    assert_eq!(serialized.trim(), valid.trim());
+                }
+
+                #[test]
+                fn [<toml_ $test_name>]() {
+                    let test_name = stringify!($test_name);
+
+                    let input = fs::read_to_string(format!("assets/inputs/{}.corn", test_name)).unwrap();
+                    let valid = fs::read_to_string(format!("assets/outputs/toml/{}.toml", test_name)).unwrap().replace("\r", "");
+
+                    let config = parse(input.as_str()).unwrap();
+                    let value = TomlValue::from(config.value);
+
+                    let serialized = toml::to_string_pretty(&value).unwrap().replace("\r", "");
+
+                    assert_eq!(serialized.trim(), valid.trim());
+                }
             }
+
         )+
     }
 }
@@ -56,7 +88,9 @@ generate_eq_tests!(
     very_compact,
     comment,
     complex,
-    readme_example
+    readme_example,
+    object_in_array,
+    value_after_table
 );
 
 generate_invalid_tests!(invalid, invalid_input);

@@ -1,0 +1,42 @@
+eight = [
+    'foo',
+    'bar',
+]
+eleven = [
+    [],
+    [],
+]
+nine = [
+    true,
+    false,
+]
+ten = []
+
+[[twelve]]
+
+[[twelve]]
+
+[five]
+
+[four]
+bar = false
+foo = true
+
+[one]
+bar = 'foo'
+foo = 'bar'
+
+[seven]
+bar = []
+foo = []
+[six.bar]
+
+[six.foo]
+
+[three]
+bar = 2.0
+foo = 1.0
+
+[two]
+bar = 2
+foo = 1

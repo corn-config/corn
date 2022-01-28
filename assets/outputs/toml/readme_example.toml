@@ -1,0 +1,26 @@
+main = 'dist/index.js'
+name = 'example-package'
+private = false
+version = '1.0.0'
+
+[[contributors]]
+email = 'mail@example.com'
+name = 'John smith'
+
+[author]
+email = 'mail@example.com'
+name = 'John smith'
+url = 'https://example.com'
+
+[bin]
+filebrowser = 'dist/index.js'
+
+[dependencies]
+dotenv = '^8.2.0'
+
+[devDependencies]
+typescript = '^4.5'
+
+[scripts]
+build = 'tsc'
+run = 'node dist'

@@ -2,7 +2,7 @@
 
 A simple and pain-free configuration language.
 
-Corn has been designed using inspiration from JSON, TOML and Nix to produce a language
+Corn has been designed using inspiration from JSON and Nix to produce a language
 that's easy and intuitive to write, good for config files, and has a feature-set
 small enough you can learn it in minutes. It was born out of the following frustrations:
 
@@ -27,6 +27,7 @@ into any supported output format. Currently these are:
 
 - JSON
 - YAML
+- TOML
 
 Windows, Linux and macOS are currently supported.
 

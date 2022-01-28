@@ -1,5 +1,5 @@
-use cornfig::error::{format_parser_err, print_err, Error, ExitCode, FileReadError};
-use cornfig::parse;
+use cornfig::error::{format_parser_err, print_err, Error, ExitCode, FileReadError, Result};
+use cornfig::{parse, Config, TomlValue};
 use std::fs::read_to_string;
 use std::path::Path;
 use std::process::exit;
@@ -11,6 +11,7 @@ use colored::*;
 enum OutputType {
     Json,
     Yaml,
+    Toml,
 }
 
 #[derive(Parser, Debug)]
@@ -33,28 +34,14 @@ fn main() {
 
     match unparsed_file {
         Ok(unparsed_file) => {
-            let output_type = get_output_type(args.output_type, path);
+            let output_type = get_output_type(args.output_type);
 
             match parse(&unparsed_file) {
-                Ok(config) => {
-                    let serialized = match output_type {
-                        OutputType::Json => serde_json::to_string_pretty(&config.value).unwrap(),
-                        OutputType::Yaml => serde_yaml::to_string(&config.value).unwrap(),
-                    };
-
-                    println!("{}", serialized);
-                }
-                Err(error) => {
-                    eprintln!("{}", error.to_string().red());
-
-                    let code = error.get_exit_code();
-
-                    if let Error::ParserError(err) = error {
-                        eprintln!("{}", format_parser_err(err, unparsed_file, path));
-                    };
-
-                    exit(code);
-                }
+                Ok(config) => match serialize(config, output_type) {
+                    Ok(serialized) => println!("{}", serialized),
+                    Err(err) => handle_err(err, unparsed_file, path),
+                },
+                Err(err) => handle_err(err, unparsed_file, path),
             };
         }
         Err(err) => {
@@ -72,25 +59,51 @@ fn main() {
 
 /// Gets the file type to use for the output.
 /// If the type arg is supplied, this is used.
-/// If not, the file extension is tried for a match.
-/// Finally, the output type falls back to JSON as the default.
-fn get_output_type(arg: Option<OutputType>, path: &Path) -> OutputType {
+/// Otherwise, the output type falls back to JSON as the default.
+fn get_output_type(arg: Option<OutputType>) -> OutputType {
     if let Some(output_type) = arg {
         return output_type;
     }
 
-    if let Some(extension) = path.extension() {
-        let extension = extension
-            .to_str()
-            .expect("Input path contained unsupported characters");
-
-        return match extension {
-            "json" => OutputType::Json,
-            "yaml" => OutputType::Yaml,
-            "yml" => OutputType::Yaml,
-            _ => OutputType::Json,
-        };
-    }
-
     OutputType::Json
+}
+
+fn serialize(config: Config, output_type: OutputType) -> Result<String> {
+    match output_type {
+        OutputType::Json => {
+            let res = serde_json::to_string_pretty(&config.value);
+            match res {
+                Ok(str) => Ok(str),
+                Err(err) => Err(Error::SerializationError(err.to_string())),
+            }
+        }
+        OutputType::Yaml => {
+            let res = serde_yaml::to_string(&config.value);
+            match res {
+                Ok(str) => Ok(str),
+                Err(err) => Err(Error::SerializationError(err.to_string())),
+            }
+        }
+        OutputType::Toml => {
+            let toml_value = TomlValue::from(config.value);
+            let res = toml::to_string_pretty(&toml_value);
+            match res {
+                Ok(str) => Ok(str),
+                Err(err) => Err(Error::SerializationError(err.to_string())),
+            }
+        }
+    }
+}
+
+fn handle_err(error: Error, unparsed_file: String, path: &Path) {
+    let code = error.get_exit_code();
+    let code_formatted = format!("[E{:0>4}]", code).red();
+
+    eprintln!("{} {}", code_formatted, error.to_string().bright_red());
+
+    if let Error::ParserError(err) = error {
+        eprintln!("{}", format_parser_err(err, unparsed_file, path));
+    };
+
+    exit(code);
 }
