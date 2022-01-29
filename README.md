@@ -103,12 +103,12 @@ This makes use of inputs, various other data types and key chaining:
 ```nix
 let {
     $entry = "dist/index.js"
-    $author = { name = "John smith" email = "mail@example.com" }
+    $author = { name = "John Smith" email = "mail@example.com" }
 } in {
     name = "example-package"
     version = "1.0.0"
     main = $entry
-    bin.filebrowser = $entry
+    bin.executable = $entry
     private = false
     
     author = $author
@@ -135,7 +135,7 @@ let {
 {
   "author": {
     "email": "mail@example.com",
-    "name": "John smith",
+    "name": "John Smith",
     "url": "https://example.com"
   },
   "bin": {
