@@ -432,6 +432,11 @@ And in fact, we could even go as far as to reduce that to a single line:
 {one={foo="bar"bar="foo"}two={foo=1bar=2}three={foo=1.0bar=2.0}four={foo=truebar=false}five={foo=nullbar=null}six={foo={}bar={}}seven={foo=[]bar=[]}eight=["foo""bar"]nine=[truefalse]ten=[nullnull]eleven=[[][]]twelve=[{}{}]}
 ```
 
+## Syntax Highlighting
+
+- VSCode: [extension](https://marketplace.visualstudio.com/items?itemName=JakeStanger.corn&ssr=false) | [repo](https://github.com/JakeStanger/corn-vscode)
+
+
 ## Contributing
 
 Contributions are very welcome, although please do open an issue first as not every potential feature will get merged.
