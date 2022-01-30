@@ -432,10 +432,25 @@ And in fact, we could even go as far as to reduce that to a single line:
 {one={foo="bar"bar="foo"}two={foo=1bar=2}three={foo=1.0bar=2.0}four={foo=truebar=false}five={foo=nullbar=null}six={foo={}bar={}}seven={foo=[]bar=[]}eight=["foo""bar"]nine=[truefalse]ten=[nullnull]eleven=[[][]]twelve=[{}{}]}
 ```
 
-## Syntax Highlighting
+## Editor Support
 
-- VSCode: [extension](https://marketplace.visualstudio.com/items?itemName=JakeStanger.corn&ssr=false) | [repo](https://github.com/JakeStanger/corn-vscode)
+### VSCode
 
+- Basic syntax highlighting
+- Support Bracket matching and commenting
+
+[extension](https://marketplace.visualstudio.com/items?itemName=JakeStanger.corn&ssr=false) | [repo](https://github.com/JakeStanger/corn-vscode)
+
+### IntelliJ
+
+- Syntax highlighting
+- Parsing, lexing and live error checking
+- Support for bracket matching and commenting
+- Basic completion support
+- Basic refactoring support
+- Basic Formatting and code style options
+
+[extension](https://plugins.jetbrains.com/plugin/18519-corn) | [repo](https://github.com/JakeStanger/corn-intellij)
 
 ## Contributing
 
