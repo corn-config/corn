@@ -1,0 +1,51 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - '*'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Update Toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16.x'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Build WASM package
+        run: wasm-pack build -- --features wasm
+
+      # wasm-pack doesn't allow package name customisation
+      # npm doesn't allow 'cornfig' :/
+      - name: Patch WASM package name
+        run: |
+          sed -i -e 's/"name": "cornfig"/"name": "cornfig-wasm"/' pkg/package.json
+
+      - name: Publish to Cargo
+        uses: actions-rs/cargo@v1
+        with:
+          command: publish
+
+      - name: Publish to NPM
+        run: |
+          cd pkg
+          npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
