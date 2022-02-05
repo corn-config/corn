@@ -25,6 +25,9 @@ jobs:
       with:
         toolchain: stable
         components: clippy
+
+    - name: Install wasm-pack
+      run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
     
     - name: Build
       uses: actions-rs/cargo@v1
@@ -51,3 +54,6 @@ jobs:
         args: --profile release
       env:
         CORN_TEST: foobar
+
+    - name: Wasm-Pack Test
+      run: wasm-pack test --node
