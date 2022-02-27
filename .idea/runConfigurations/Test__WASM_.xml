@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Test (WASM)" type="WasmPackCommandRunConfiguration" factoryName="wasm-pack">
+    <option name="command" value="test --node" />
+    <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+    <option name="command" value="test --node" />
+    <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+    <method v="2">
+      <option name="WASM_PACK.BUILD_TASK_PROVIDER" enabled="true" />
+    </method>
+  </configuration>
+</component>
