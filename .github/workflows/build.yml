@@ -58,4 +58,6 @@ jobs:
         CORN_TEST: foobar
 
     - name: Wasm-Pack Test
+      # wasm-pack doesn't seem to work on the windows images
+      if: ${{ matrix.os != 'windows-latest' }}
       run: wasm-pack test --node
