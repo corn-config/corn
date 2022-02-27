@@ -49,7 +49,7 @@ cornfig file.corn -t yaml
 Corn can be used as a Rust library to deserialize config files directly
 without needing to convert to other file formats.
 
-Rust docs can be found [here](https://docs.rs/cornfig/latest/cornfig/).
+[crate](https://crates.io/crates/cornfig) | [docs](https://docs.rs/cornfig/latest/cornfig/)
 
 ```rust
 use cornfig::parse;
@@ -62,6 +62,17 @@ fn main() {
 
     assert_eq!(json, "{\"foo\": 42}");
 }
+```
+
+A WASM version for use in NodeJS and browsers is also available.
+
+[npm](https://www.npmjs.com/package/cornfig-wasm)
+
+```js
+import * as corn from 'cornfig-wasm';
+
+const parsed = corn.parse('{foo = "bar"}');
+console.log(parsed.value) // { foo: "bar" }
 ```
 
 ## Writing Corn
@@ -466,3 +477,12 @@ At the moment Corn is in very early stages. If you'd like to help out, I'd absol
 ### Running Tests
 
 You must set `CORN_TEST=foobar` as this is required for the environment variable tests.
+
+### WASM
+
+WASM support is a feature called `wasm` which is disabled by default. 
+Make sure to enable it when building:
+
+```sh
+wasm-pack build -- --features wasm
+```

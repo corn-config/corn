@@ -4,6 +4,14 @@ version = "0.2.0"
 edition = "2021"
 license = "MIT"
 description = "A simple and pain-free configuration language."
+repository = "https://github.com/JakeStanger/corn"
+keywords = ["configuration", "language", "wasm", "pest", "peg", "grammar"]
+
+[features]
+wasm = ["wasm-bindgen", "console_error_panic_hook", "wee_alloc"]
+
+[lib]
+crate-type = ["cdylib", "rlib"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -16,6 +24,11 @@ serde_yaml = "0.8.23"
 colored = "2.0.0"
 clap = { version = "3.0.11", features = ["derive"] }
 toml = "0.5.8"
+cfg-if = "1.0.0"
+wasm-bindgen = { version = "0.2.79", features = ["serde-serialize"], optional = true }
+console_error_panic_hook = { version = "0.1.7", optional = true }
+wee_alloc = { version = "0.4.5", optional = true }
 
 [dev-dependencies]
 paste = "1.0.6"
+wasm-bindgen-test = { version = "0.3.29" }
