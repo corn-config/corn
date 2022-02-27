@@ -136,6 +136,9 @@ let {
     }
     
     devDependencies.typescript = "^4.5"
+    
+    config.port = 8080
+    config.hostname = null
 }
 ```
 
@@ -151,6 +154,10 @@ let {
   },
   "bin": {
     "filebrowser": "dist/index.js"
+  },
+  "config": {
+    "hostname": null,
+    "port": 8080
   },
   "contributors": [
     {

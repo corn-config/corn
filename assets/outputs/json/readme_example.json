@@ -1,16 +1,20 @@
 {
   "author": {
     "email": "mail@example.com",
-    "name": "John smith",
+    "name": "John Smith",
     "url": "https://example.com"
   },
   "bin": {
     "filebrowser": "dist/index.js"
   },
+  "config": {
+    "hostname": null,
+    "port": 8080
+  },
   "contributors": [
     {
       "email": "mail@example.com",
-      "name": "John smith"
+      "name": "John Smith"
     }
   ],
   "dependencies": {

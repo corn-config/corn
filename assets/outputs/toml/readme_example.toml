@@ -5,15 +5,18 @@ version = '1.0.0'
 
 [[contributors]]
 email = 'mail@example.com'
-name = 'John smith'
+name = 'John Smith'
 
 [author]
 email = 'mail@example.com'
-name = 'John smith'
+name = 'John Smith'
 url = 'https://example.com'
 
 [bin]
 filebrowser = 'dist/index.js'
+
+[config]
+port = 8080
 
 [dependencies]
 dotenv = '^8.2.0'

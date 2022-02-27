@@ -1,7 +1,8 @@
 let {
     $entry = "dist/index.js"
-    $author = { name = "John smith" email = "mail@example.com" }
-} in {
+    $author = { name = "John Smith" email = "mail@example.com" }
+} in
+{
     name = "example-package"
     version = "1.0.0"
     main = $entry
@@ -22,4 +23,7 @@ let {
     }
 
     devDependencies.typescript = "^4.5"
+
+    config.port = 8080
+    config.hostname = null
 }
