@@ -43,7 +43,9 @@ jobs:
       - name: Publish to Cargo
         uses: actions-rs/cargo@v1
         with:
-          command: publish
+          command: publish --token ${CARGO_REGISTRY_TOKEN}
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
 
       - name: Publish to NPM
         run: |
