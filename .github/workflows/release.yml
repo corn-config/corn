@@ -32,7 +32,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Build WASM package
-        run: wasm-pack build -- --features wasm
+        run: wasm-pack build --out-name index -- --features wasm
 
       # wasm-pack doesn't allow package name customisation
       # npm doesn't allow 'cornfig' :/
