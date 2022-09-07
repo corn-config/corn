@@ -11,7 +11,7 @@ pub fn parse(corn: &str) -> Result<JsValue, JsValue> {
 
     match res {
         Ok(parsed) => Ok(JsValue::from_serde(&parsed).unwrap()),
-        Err(err) => Err(JsValue::from_str(err.to_string().as_str()))
+        Err(err) => Err(JsValue::from_str(err.to_string().as_str())),
     }
 }
 
