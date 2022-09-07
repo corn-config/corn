@@ -27,3 +27,4 @@ typescript = '^4.5'
 [scripts]
 build = 'tsc'
 run = 'node dist'
+

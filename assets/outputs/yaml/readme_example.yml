@@ -1,16 +1,15 @@
----
 author:
   email: mail@example.com
   name: John Smith
-  url: "https://example.com"
+  url: https://example.com
 bin:
   filebrowser: dist/index.js
 config:
-  hostname: ~
+  hostname: null
   port: 8080
 contributors:
-  - email: mail@example.com
-    name: John Smith
+- email: mail@example.com
+  name: John Smith
 dependencies:
   dotenv: ^8.2.0
 devDependencies:

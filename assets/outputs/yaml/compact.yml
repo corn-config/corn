@@ -1,19 +1,18 @@
----
 eight:
-  - foo
-  - bar
+- foo
+- bar
 eleven:
-  - []
-  - []
+- []
+- []
 five:
-  bar: ~
-  foo: ~
+  bar: null
+  foo: null
 four:
   bar: false
   foo: true
 nine:
-  - true
-  - false
+- true
+- false
 one:
   bar: foo
   foo: bar
@@ -24,14 +23,14 @@ six:
   bar: {}
   foo: {}
 ten:
-  - ~
-  - ~
+- null
+- null
 three:
   bar: 2.0
   foo: 1.0
 twelve:
-  - {}
-  - {}
+- {}
+- {}
 two:
   bar: 2
   foo: 1

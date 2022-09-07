@@ -80,7 +80,8 @@ console.log(parsed.value) // { foo: "bar" }
 > This section gives all the outputs in JSON format. Remember you can output in any supported format!
 
 All Corn files must contain a top-level object that contains keys/values.
-Keys must be alphanumeric and do not need quotes around them.
+Keys do not need quotes around them, and can contain any unicode character except whitespace and equals `=` (yes even emoji).
+
 Values must be one of the following:
 
 - String
@@ -92,9 +93,11 @@ Values must be one of the following:
 - Null
 - Input
 
+(More on these types below)
+
 A very basic example therefore would be:
 
-```nix
+```corn
 {
     hello = "world"
 }
@@ -111,7 +114,7 @@ Which of course maps to the following in JSON:
 A more complex example would be something like a `package.json`. 
 This makes use of inputs, various other data types and key chaining:
 
-```nix
+```corn
 let {
     $entry = "dist/index.js"
     $author = { name = "John Smith" email = "mail@example.com" }
@@ -189,7 +192,7 @@ let {
 
 Strings must be surrounded by double quotes. All unicode is supported.
 
-```nix
+```corn
 foo = "bar"
 ```
 
@@ -198,7 +201,7 @@ foo = "bar"
 Integers are signed and 64 bit, meaning you can use any value
 between `-9223372036854775808` and `9223372036854775807`.
 
-```nix
+```corn
 answer = 42
 ```
 
@@ -206,7 +209,7 @@ answer = 42
 
 Double precision (64-bit) floats are used.
 
-```nix
+```corn
 pi = 3.14159
 ```
 
@@ -214,7 +217,7 @@ pi = 3.14159
 
 As you'd expect.
 
-```nix
+```corn
 not_false = true
 ```
 
@@ -225,7 +228,7 @@ They contain key/value pairs.
 
 There is no restriction on nesting objects within objects or arrays.
 
-```nix
+```corn
 {
   foo = "bar"
   hello = "world"
@@ -238,13 +241,13 @@ Arrays use square brackets to mark the start and end.
 Values are space-separated. 
 Like objects, there is no restriction on nesting arrays or objects inside.
 
-```nix
+```corn
     array = [ 1 2 3 ]
 ```
 
 You can also include whitespace as you please and mix element types:
 
-```nix
+```corn
 {
     array = [ 1 2 3 ]
     array2 = [
@@ -280,7 +283,7 @@ The above converts to the following JSON:
 
 Null values simply use the `null` keyword:
 
-```nix
+```corn
 foo = null
 ```
 
@@ -298,7 +301,7 @@ Inputs can be used to store any value type, or inside strings.
 To declare inputs, you must include a `let { } in` block
 at the start of your config.
 
-```nix
+```corn
 let { 
     $firstName = "John"
     $lastName = "Smith" 
@@ -322,7 +325,7 @@ let {
 As well as declaring your own inputs, you can also access any environment variables by prefixing input names with `$env_`.
 For example, to use the system `PATH`:
 
-```nix
+```corn
 {
     path = $env_PATH
 }
@@ -348,7 +351,7 @@ without needing to trawl through the whole file.
 At any point you can start a comment using `//`. A comment is terminated by a newline `\n` character.
 Comments are entirely ignored and not included in the output.
 
-```nix
+```corn
 {
     // this is a single-line comment
     foo = bar // this is a mixed-line comment
@@ -360,7 +363,7 @@ Comments are entirely ignored and not included in the output.
 Throughout the page, we've created objects within objects
 using a syntax like this:
 
-```nix
+```corn
 {
     foo = {
         bar = "baz"
@@ -373,7 +376,7 @@ and the braces add a lot of noise when reading.
 
 To solve this, keys can be chained to create deep objects instantly:
 
-```nix
+```corn
 {
     foo.bar = "baz"
 }
@@ -391,7 +394,7 @@ Which in JSON is:
 
 You can mix and match chained keys with nested objects at any time:
 
-```nix
+```corn
 {
     foo = {
         bar.baz = 42
@@ -423,18 +426,19 @@ There are only a few exceptions to this:
 
 - An integer or float following an integer or float must be whitespace separated to tell where one ends and the next starts.
 - References to inputs must terminate with whitespace as otherwise the parser cannot tell where the name ends.
+- There must be whitespace between `key=value` assignments
 
 This means the below is perfectly valid (although for general consistency and readability this is strongly not recommended):
 
-```nix
+```corn
 {
-    one={foo="bar"bar="foo"}
-    two={foo=1bar=2}
-    three={foo=1.0bar=2.0}
-    four={foo=truebar=false}
-    five={foo=nullbar=null}
-    six={foo={}bar={}}
-    seven={foo=[]bar=[]}
+    one={foo="bar" bar="foo"}
+    two={foo=1 bar=2}
+    three={foo=1.0 bar=2.0}
+    four={foo=true bar=false}
+    five={foo=null bar=null}
+    six={foo={} bar={}}
+    seven={foo=[] bar=[]}
 
     eight=["foo""bar"]
     nine=[truefalse]
@@ -446,8 +450,8 @@ This means the below is perfectly valid (although for general consistency and re
 
 And in fact, we could even go as far as to reduce that to a single line:
 
-```nix
-{one={foo="bar"bar="foo"}two={foo=1bar=2}three={foo=1.0bar=2.0}four={foo=truebar=false}five={foo=nullbar=null}six={foo={}bar={}}seven={foo=[]bar=[]}eight=["foo""bar"]nine=[truefalse]ten=[nullnull]eleven=[[][]]twelve=[{}{}]}
+```corn
+{one={foo="bar" bar="foo"} two={foo=1 bar=2} three={foo=1.0 bar=2.0} four={foo=true bar=false} five={foo=null bar=null} six={foo={} bar={}} seven={foo=[] bar=[]} eight=["foo""bar"] nine=[truefalse] ten=[nullnull] eleven=[[][]] twelve=[{}{}]}
 ```
 
 ## Editor Support

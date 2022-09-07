@@ -7,6 +7,9 @@ pub(crate) use crate::parser::Rule;
 pub mod error;
 mod parser;
 
+#[cfg(feature = "wasm")]
+mod wasm;
+
 /// A map of input names and values.
 /// The names include their `$` prefix.
 pub type Inputs<'a> = HashMap<&'a str, Value<'a>>;

@@ -1,0 +1,7 @@
+{
+    with_underscore = 0
+    with-dash = 1
+    with_🌽 = 2
+    !"£$%^&*()_ = 3
+    12345 = 4
+}

@@ -16,7 +16,7 @@ path = ${
     ~ ( "." ~ path_char+ )*
 }
 
-path_char = { ASCII_ALPHANUMERIC | "_" }
+path_char = { !( WHITESPACE | "=" ) ~ ANY }
 
 value = _{ object | array | input | string | float | integer | boolean | null }
 
