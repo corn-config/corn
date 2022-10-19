@@ -172,7 +172,7 @@ fn parse_assign_block(block: Pair<Rule>) -> Result<Inputs> {
 /// # Examples
 ///
 /// ```rust
-/// use cornfig::parse;
+/// use libcorn::parse;
 ///
 /// let corn = "{foo = 42}";
 ///

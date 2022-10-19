@@ -1,19 +1,22 @@
 use colored::*;
+use libcorn::error::{Error as CornError, FileReadError, InputResolveError, SerializationError};
+use libcorn::Rule;
 use pest::error::{ErrorVariant, LineColLocation};
-use std::fmt::{Debug, Display, Formatter};
+use std::fmt::{Display, Formatter};
+use std::io;
 use std::path::Path;
-use std::{fmt, io};
 
-use crate::Rule;
+#[derive(Debug)]
+pub enum Error {
+    /// Error from the Corn parser
+    Corn(CornError),
+    /// Error while reading the input file from disk
+    ReadingFile(io::Error),
+    /// Error when serializing output
+    Serializing(String),
+}
 
 type PestError = pest::error::Error<Rule>;
-
-#[derive(Debug)]
-pub struct InputResolveError(pub String);
-#[derive(Debug)]
-pub struct FileReadError(pub String);
-#[derive(Debug)]
-pub struct SerializationError(pub String);
 
 pub trait ExitCode {
     const EXIT_CODE: i32;
@@ -35,65 +38,38 @@ impl ExitCode for SerializationError {
     const EXIT_CODE: i32 = 4;
 }
 
-#[derive(Debug)]
-pub enum Error {
-    /// Error while parsing the file
-    ParserError(pest::error::Error<Rule>),
-    /// Error while looking up a referenced an input
-    InputResolveError(InputResolveError),
-    /// Error while reading the input file from disk
-    FileReadError(io::Error),
-    /// Error when serializing output
-    SerializationError(String),
-}
-
 impl std::error::Error for Error {}
-
-impl From<InputResolveError> for Error {
-    fn from(err: InputResolveError) -> Self {
-        Self::InputResolveError(err)
-    }
-}
-
-impl From<pest::error::Error<Rule>> for Error {
-    fn from(err: pest::error::Error<Rule>) -> Self {
-        Self::ParserError(err)
-    }
-}
 
 impl From<io::Error> for Error {
     fn from(err: io::Error) -> Self {
-        Self::FileReadError(err)
+        Self::ReadingFile(err)
     }
 }
 
 impl From<serde_json::Error> for Error {
     fn from(err: serde_json::Error) -> Self {
-        Self::SerializationError(err.to_string())
+        Self::Serializing(err.to_string())
     }
 }
 
 impl From<serde_yaml::Error> for Error {
     fn from(err: serde_yaml::Error) -> Self {
-        Self::SerializationError(err.to_string())
+        Self::Serializing(err.to_string())
     }
 }
 
 impl From<toml::ser::Error> for Error {
     fn from(err: toml::ser::Error) -> Self {
-        Self::SerializationError(err.to_string())
+        Self::Serializing(err.to_string())
     }
 }
 
 impl Display for Error {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Error::ParserError(_) => writeln!(f, "An error while parsing the input file."),
-            Error::InputResolveError(err) => {
-                write!(f, "Input `{}` was used but not declared", err.0)
-            }
-            Error::FileReadError(err) => write!(f, "{}", err),
-            Error::SerializationError(err) => write!(
+            Error::Corn(err) => write!(f, "{}", err),
+            Error::ReadingFile(err) => write!(f, "{}", err),
+            Error::Serializing(err) => write!(
                 f,
                 "The input could not be serialized into the requested output format:\n\t{}",
                 err
@@ -105,15 +81,13 @@ impl Display for Error {
 impl Error {
     pub fn get_exit_code(&self) -> i32 {
         match self {
-            Error::ParserError(_) => pest::error::Error::EXIT_CODE,
-            Error::InputResolveError(_) => InputResolveError::EXIT_CODE,
-            Error::FileReadError(_) => FileReadError::EXIT_CODE,
-            Error::SerializationError(_) => SerializationError::EXIT_CODE,
+            Error::Corn(CornError::ParserError(_)) => pest::error::Error::EXIT_CODE,
+            Error::Corn(CornError::InputResolveError(_)) => pest::error::Error::EXIT_CODE,
+            Error::ReadingFile(_) => FileReadError::EXIT_CODE,
+            Error::Serializing(_) => SerializationError::EXIT_CODE,
         }
     }
 }
-
-pub type Result<T> = std::result::Result<T, Error>;
 
 /// Pretty-prints `message` to `stderr`.
 /// If `context` is supplied,
@@ -129,7 +103,7 @@ pub fn print_err(message: String, context: Option<String>) {
 }
 
 /// Pretty prints a parser error,
-/// indicating where in the corn source code the error occurred
+/// indicating where in the corn-cli source code the error occurred
 /// and the rules the parser expected in that position.
 ///
 /// The output is designed to mimic the Rust compiler output.

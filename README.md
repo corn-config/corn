@@ -34,14 +34,14 @@ Windows, Linux and macOS are currently supported.
 Install it using cargo:
 
 ```shell
-cargo install cornfig
+cargo install corn-cli
 ```
 
 Then simply:
 
 ```shell
-cornfig file.corn
-cornfig file.corn -t yaml
+corn file.corn-cli
+corn file.corn-cli -t yaml
 ```
 
 ### As a library
@@ -49,10 +49,10 @@ cornfig file.corn -t yaml
 Corn can be used as a Rust library to deserialize config files directly
 without needing to convert to other file formats.
 
-[crate](https://crates.io/crates/cornfig) | [docs](https://docs.rs/cornfig/latest/cornfig/)
+[crate](https://crates.io/crates/libcorn) | [docs](https://docs.rs/libcorn/latest/libcorn)
 
 ```rust
-use cornfig::parse;
+use libcorn::parse;
 
 fn main() {
     let corn = "{foo = 42}";
@@ -66,10 +66,13 @@ fn main() {
 
 A WASM version for use in NodeJS and browsers is also available.
 
-[npm](https://www.npmjs.com/package/cornfig-wasm)
+> ⚠ Note when running under NodeJS you will require `--experimental-modules` for versions <= 16. 
+> On all versions you require `--experimental-wasm-modules`.
+
+[npm](https://www.npmjs.com/package/libcorn)
 
 ```js
-import * as corn from 'cornfig-wasm';
+import * as corn from 'libcorn';
 
 const parsed = corn.parse('{foo = "bar"}');
 console.log(parsed.value) // { foo: "bar" }
@@ -80,7 +83,10 @@ console.log(parsed.value) // { foo: "bar" }
 > This section gives all the outputs in JSON format. Remember you can output in any supported format!
 
 All Corn files must contain a top-level object that contains keys/values.
-Keys do not need quotes around them, and can contain any unicode character except whitespace and equals `=` (yes even emoji).
+
+Keys do not require quotes around them. The first character in the key cannot be whilespace, a number or any of the following characters: `. - " $ { [ =`.
+The remaining characters can be any unicode character except whitespace and the following:  `. =`.
+
 
 Values must be one of the following:
 

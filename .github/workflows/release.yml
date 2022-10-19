@@ -16,6 +16,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Install build deps
+        run: sudo apt install jq
+
       - name: Update Toolchain
         uses: actions-rs/toolchain@v1
         with:
@@ -28,17 +31,11 @@ jobs:
 
       - uses: actions/setup-node@v2
         with:
-          node-version: '16.x'
+          node-version: '18.x'
           registry-url: 'https://registry.npmjs.org'
 
       - name: Build WASM package
-        run: wasm-pack build --out-name index -- --features wasm
-
-      # wasm-pack doesn't allow package name customisation
-      # npm doesn't allow 'cornfig' :/
-      - name: Patch WASM package name
-        run: |
-          sed -i -e 's/"name": "cornfig"/"name": "cornfig-wasm"/' pkg/package.json
+        run: scripts/build-wasm.sh
 
       - name: Publish to Cargo
         uses: actions-rs/cargo@v1

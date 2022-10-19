@@ -1,13 +1,15 @@
-use cornfig::error::{format_parser_err, print_err, Error, ExitCode, FileReadError, Result};
-use cornfig::{parse, Config, TomlValue};
+use corn_cli::error::{format_parser_err, print_err, Error, ExitCode};
+use libcorn::error::FileReadError;
+use libcorn::{parse, Config, TomlValue};
 use std::fs::read_to_string;
 use std::path::Path;
 use std::process::exit;
 
-use clap::{ArgEnum, Parser};
+use crate::Error::Corn;
+use clap::{Parser, ValueEnum};
 use colored::*;
 
-#[derive(ArgEnum, Clone, Debug)]
+#[derive(ValueEnum, Clone, Debug)]
 enum OutputType {
     Json,
     Yaml,
@@ -17,11 +19,11 @@ enum OutputType {
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 struct Args {
-    /// Path to the input corn file
+    /// Path to the input corn-cli file
     input: String,
 
     /// The file format to output
-    #[clap(long = "type", short = 't', arg_enum)]
+    #[clap(long = "type", short = 't', value_enum)]
     output_type: Option<OutputType>,
 }
 
@@ -41,7 +43,7 @@ fn main() {
                     Ok(serialized) => println!("{}", serialized),
                     Err(err) => handle_err(err, unparsed_file, path),
                 },
-                Err(err) => handle_err(err, unparsed_file, path),
+                Err(err) => handle_err(Corn(err), unparsed_file, path),
             };
         }
         Err(err) => {
@@ -68,20 +70,20 @@ fn get_output_type(arg: Option<OutputType>) -> OutputType {
     OutputType::Json
 }
 
-fn serialize(config: Config, output_type: OutputType) -> Result<String> {
+fn serialize(config: Config, output_type: OutputType) -> Result<String, Error> {
     match output_type {
         OutputType::Json => {
             let res = serde_json::to_string_pretty(&config.value);
             match res {
                 Ok(str) => Ok(str),
-                Err(err) => Err(Error::SerializationError(err.to_string())),
+                Err(err) => Err(Error::Serializing(err.to_string())),
             }
         }
         OutputType::Yaml => {
             let res = serde_yaml::to_string(&config.value);
             match res {
                 Ok(str) => Ok(str),
-                Err(err) => Err(Error::SerializationError(err.to_string())),
+                Err(err) => Err(Error::Serializing(err.to_string())),
             }
         }
         OutputType::Toml => {
@@ -89,7 +91,7 @@ fn serialize(config: Config, output_type: OutputType) -> Result<String> {
             let res = toml::to_string_pretty(&toml_value);
             match res {
                 Ok(str) => Ok(str),
-                Err(err) => Err(Error::SerializationError(err.to_string())),
+                Err(err) => Err(Error::Serializing(err.to_string())),
             }
         }
     }
@@ -101,7 +103,7 @@ fn handle_err(error: Error, unparsed_file: String, path: &Path) {
 
     eprintln!("{} {}", code_formatted, error.to_string().bright_red());
 
-    if let Error::ParserError(err) = error {
+    if let Error::Corn(libcorn::error::Error::ParserError(err)) = error {
         eprintln!("{}", format_parser_err(err, unparsed_file, path));
     };
 

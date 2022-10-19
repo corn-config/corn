@@ -1,7 +1,9 @@
 #![allow(dead_code)]
 
 use wasm_bindgen::prelude::*;
-use wasm_bindgen::JsValue;
+use wasm_bindgen::{JsValue};
+use serde_wasm_bindgen::to_value;
+
 #[cfg(test)]
 use wasm_bindgen_test::*;
 
@@ -12,7 +14,7 @@ pub fn parse(corn: &str) -> Result<JsValue, JsValue> {
     let res = crate::parse(corn);
 
     match res {
-        Ok(parsed) => Ok(JsValue::from_serde(&parsed).unwrap()),
+        Ok(parsed) => Ok(to_value(&parsed).expect("Failed to convert struct into js value")),
         Err(err) => Err(JsValue::from_str(err.to_string().as_str())),
     }
 }

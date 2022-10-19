@@ -61,3 +61,4 @@ jobs:
       # wasm-pack doesn't seem to work on the windows images
       if: ${{ matrix.os != 'windows-latest' }}
       run: wasm-pack test --node
+      working-directory: libcorn

@@ -1,0 +1,18 @@
+[package]
+name = "corn-cli"
+version = "0.4.0"
+edition = "2021"
+license = "MIT"
+description = "CLI for Corn, A simple and pain-free configuration language."
+repository = "https://github.com/JakeStanger/corn"
+keywords = ["configuration", "language", "wasm", "pest", "peg", "cli"]
+
+[dependencies]
+libcorn = { path = "../libcorn" }
+clap = { version = "4.0.15", features = ["derive"] }
+colored = "2.0.0"
+serde = { version = "1.0.133", features = ["derive"] }
+serde_json = "1.0.75"
+serde_yaml = "0.9.11"
+toml = "0.5.9"
+pest = "2.3.0"
