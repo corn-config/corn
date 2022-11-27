@@ -85,6 +85,7 @@ generate_eq_tests!(
     environment_variable,
     float,
     input,
+    input_references_input,
     integer,
     mixed_array,
     null,

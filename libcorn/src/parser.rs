@@ -19,19 +19,24 @@ impl std::fmt::Display for Rule {
 }
 
 struct CornParser<'a> {
+    input_block: Option<Pair<'a, Rule>>,
     inputs: Inputs<'a>,
 }
 
 impl<'a> CornParser<'a> {
     pub fn new(input_block: Option<Pair<'a, Rule>>) -> Self {
-        let inputs = input_block
-            .map(|block| Self::parse_assign_block(block).unwrap())
-            .unwrap_or_else(HashMap::new);
-
-        Self { inputs }
+        let inputs = HashMap::new();
+        Self {
+            input_block,
+            inputs,
+        }
     }
 
-    pub fn parse(self, object_block: Pair<'a, Rule>) -> Result<Value> {
+    pub fn parse(mut self, object_block: Pair<'a, Rule>) -> Result<Value> {
+        if let Some(input_block) = self.input_block.take() {
+            self.parse_assign_block(input_block).unwrap()
+        }
+
         let value_block = self.parse_object(object_block)?;
         Ok(Value::Object(value_block))
     }
@@ -162,22 +167,19 @@ impl<'a> CornParser<'a> {
 
     /// Parses the `let { } in` block at the start of files,
     /// producing a populated HashMap as an output.
-    fn parse_assign_block(block: Pair<'a, Rule>) -> Result<Inputs> {
+    fn parse_assign_block(&mut self, block: Pair<'a, Rule>) -> Result<()> {
         assert_eq!(block.as_rule(), Rule::assign_block);
-
-        let mut inputs = HashMap::new();
-        let parser = Self::new(None);
 
         for pair in block.into_inner() {
             let mut assign_rules = pair.into_inner();
             let name = assign_rules.next().unwrap().as_str();
 
-            let value = parser.parse_value(assign_rules.next().unwrap())?;
+            let value = self.parse_value(assign_rules.next().unwrap())?;
 
-            inputs.insert(name, value);
+            self.inputs.insert(name, value);
         }
 
-        Ok(inputs)
+        Ok(())
     }
 
     /// Attempts to get an input value from the `inputs` map.

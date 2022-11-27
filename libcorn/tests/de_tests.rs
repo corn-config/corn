@@ -12,7 +12,7 @@ macro_rules! generate_eq_tests {
                     let test_name = stringify!($test_name);
 
                     let input = fs::read_to_string(format!("../assets/inputs/{test_name}.corn")).unwrap();
-                    let config = from_str::<$test_type>(&input);
+                    let config = from_str::<$test_type>(&input).unwrap();
 
                     let json_input = fs::read_to_string(format!("../assets/outputs/json/{test_name}.json")).unwrap();
                     let json_config = serde_json::from_str(&json_input).unwrap();
@@ -421,6 +421,7 @@ generate_eq_tests!(
     (environment_variable, Basic),
     (float, Float),
     (input, Input),
+    (input_references_input, Basic),
     (integer, Integer),
     (mixed_array, MixedArray),
     (null, Null),
@@ -432,12 +433,14 @@ generate_eq_tests!(
     (very_compact, Compact)
 );
 
+// TODO: Several of these can use the macro, tidy
+
 #[test]
 fn basic_new_type_enum() {
     let test_name = "basic";
 
     let input = fs::read_to_string(format!("../assets/inputs/{test_name}.corn")).unwrap();
-    let config = from_str::<BasicNewTypeEnum>(&input);
+    let config = from_str::<BasicNewTypeEnum>(&input).unwrap();
 
     let json_input =
         fs::read_to_string(format!("../assets/outputs/json/{test_name}.json")).unwrap();
@@ -451,7 +454,7 @@ fn basic_unit_enum() {
     let test_name = "basic";
 
     let input = fs::read_to_string(format!("../assets/inputs/{test_name}.corn")).unwrap();
-    let config = from_str::<BasicUnitEnum>(&input);
+    let config = from_str::<BasicUnitEnum>(&input).unwrap();
 
     let json_input =
         fs::read_to_string(format!("../assets/outputs/json/{test_name}.json")).unwrap();
@@ -465,7 +468,7 @@ fn basic_new_type() {
     let test_name = "basic";
 
     let input = fs::read_to_string(format!("../assets/inputs/{test_name}.corn")).unwrap();
-    let config = from_str::<BasicNewType>(&input);
+    let config = from_str::<BasicNewType>(&input).unwrap();
 
     let json_input =
         fs::read_to_string(format!("../assets/outputs/json/{test_name}.json")).unwrap();
@@ -479,7 +482,7 @@ fn bytes() {
     let test_name = "basic";
 
     let input = fs::read_to_string(format!("../assets/inputs/{test_name}.corn")).unwrap();
-    let config = from_str::<Bytes>(&input);
+    let config = from_str::<Bytes>(&input).unwrap();
 
     let json_input =
         fs::read_to_string(format!("../assets/outputs/json/{test_name}.json")).unwrap();
@@ -493,7 +496,7 @@ fn chained_enum() {
     let test_name = "chained";
 
     let input = fs::read_to_string(format!("../assets/inputs/{test_name}.corn")).unwrap();
-    let config = from_str::<ChainedEnum>(&input);
+    let config = from_str::<ChainedEnum>(&input).unwrap();
 
     let json_input =
         fs::read_to_string(format!("../assets/outputs/json/{test_name}.json")).unwrap();
@@ -507,7 +510,7 @@ fn mixed_array_enum() {
     let test_name = "mixed_array";
 
     let input = fs::read_to_string(format!("../assets/inputs/{test_name}.corn")).unwrap();
-    let config = from_str::<MixedArrayEnum>(&input);
+    let config = from_str::<MixedArrayEnum>(&input).unwrap();
 
     let json_input =
         fs::read_to_string(format!("../assets/outputs/json/{test_name}.json")).unwrap();
@@ -521,7 +524,7 @@ fn null_option() {
     let test_name = "null";
 
     let input = fs::read_to_string(format!("../assets/inputs/{test_name}.corn")).unwrap();
-    let config = from_str::<NullOption>(&input);
+    let config = from_str::<NullOption>(&input).unwrap();
 
     let json_input =
         fs::read_to_string(format!("../assets/outputs/json/{test_name}.json")).unwrap();
@@ -535,7 +538,7 @@ fn null_unit() {
     let test_name = "null";
 
     let input = fs::read_to_string(format!("../assets/inputs/{test_name}.corn")).unwrap();
-    let config = from_str::<NullUnit>(&input);
+    let config = from_str::<NullUnit>(&input).unwrap();
 
     let json_input =
         fs::read_to_string(format!("../assets/outputs/json/{test_name}.json")).unwrap();
@@ -549,7 +552,7 @@ fn str() {
     let test_name = "string";
 
     let input = fs::read_to_string(format!("../assets/inputs/{test_name}.corn")).unwrap();
-    let config = from_str::<Str>(&input);
+    let config = from_str::<Str>(&input).unwrap();
 
     let json_input =
         fs::read_to_string(format!("../assets/outputs/json/{test_name}.json")).unwrap();

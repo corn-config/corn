@@ -1,0 +1,6 @@
+let {
+    $foo = "bar"
+    $baz = $foo
+} in {
+    foo = $baz
+}
