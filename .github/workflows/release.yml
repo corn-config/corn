@@ -66,6 +66,8 @@ jobs:
         uses: katyo/publish-crates@v1
         with:
           registry-token: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+          ignore-unpublished-changes: true
+          publish-delay: 10_000
 
       - name: Publish to NPM
         run: |
