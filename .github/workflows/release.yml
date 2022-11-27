@@ -34,6 +34,7 @@ jobs:
         with:
           node-version: '18.x'
           registry-url: 'https://registry.npmjs.org'
+        working-directory: ./pkg
 
       - name: Build WASM package
         run: scripts/build-wasm.sh
@@ -70,8 +71,7 @@ jobs:
           publish-delay: 10_000
 
       - name: Publish to NPM
-        run: |
-          cd pkg
-          npm publish
+        run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        working-directory: ./pkg
