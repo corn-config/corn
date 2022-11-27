@@ -1,6 +1,6 @@
 use corn_cli::error::{format_parser_err, print_err, Error, ExitCode};
 use libcorn::error::FileReadError;
-use libcorn::{parse, Config, TomlValue};
+use libcorn::{parse, TomlValue, Value};
 use std::fs::read_to_string;
 use std::path::Path;
 use std::process::exit;
@@ -70,24 +70,24 @@ fn get_output_type(arg: Option<OutputType>) -> OutputType {
     OutputType::Json
 }
 
-fn serialize(config: Config, output_type: OutputType) -> Result<String, Error> {
+fn serialize(config: Value, output_type: OutputType) -> Result<String, Error> {
     match output_type {
         OutputType::Json => {
-            let res = serde_json::to_string_pretty(&config.value);
+            let res = serde_json::to_string_pretty(&config);
             match res {
                 Ok(str) => Ok(str),
                 Err(err) => Err(Error::Serializing(err.to_string())),
             }
         }
         OutputType::Yaml => {
-            let res = serde_yaml::to_string(&config.value);
+            let res = serde_yaml::to_string(&config);
             match res {
                 Ok(str) => Ok(str),
                 Err(err) => Err(Error::Serializing(err.to_string())),
             }
         }
         OutputType::Toml => {
-            let toml_value = TomlValue::from(config.value);
+            let toml_value = TomlValue::from(config);
             let res = toml::to_string_pretty(&toml_value);
             match res {
                 Ok(str) => Ok(str),
@@ -104,7 +104,7 @@ fn handle_err(error: Error, unparsed_file: String, path: &Path) {
     eprintln!("{} {}", code_formatted, error.to_string().bright_red());
 
     if let Error::Corn(libcorn::error::Error::ParserError(err)) = error {
-        eprintln!("{}", format_parser_err(err, unparsed_file, path));
+        eprintln!("{}", format_parser_err(*err, unparsed_file, path));
     };
 
     exit(code);

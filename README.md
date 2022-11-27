@@ -23,7 +23,7 @@ Unlike JSON or YAML or TOML, you cannot serialize code back into Corn.
 ### As a binary
 
 Corn can be installed as an executable binary to convert files from the `.corn` format
-into any supported output format. Currently these are:
+into any supported output format. Currently, these are:
 
 - JSON
 - YAML
@@ -51,18 +51,25 @@ without needing to convert to other file formats.
 
 [crate](https://crates.io/crates/libcorn) | [docs](https://docs.rs/libcorn/latest/libcorn)
 
+The recommended way to do this is using `serde` into a struct:
+
 ```rust
-use libcorn::parse;
+use serde::Deserialize;
+
+#[derive(Deserialize)]
+struct Config {
+    foo: u8
+}
 
 fn main() {
     let corn = "{foo = 42}";
-
-    let config = parse(corn).unwrap();
-    let json = serde_json::to_string_pretty(&config.value).unwrap();
-
-    assert_eq!(json, "{\"foo\": 42}");
+    let config = libcorn::from_str::<Config>(corn).unwrap();
+    assert_eq!(config.foo, 42);
 }
 ```
+
+You can also use `libcorn::parse` directly to get an AST representation of the config. 
+This can be serialized directly, which offers a faster route when converting to other formats.
 
 A WASM version for use in NodeJS and browsers is also available.
 
@@ -75,7 +82,7 @@ A WASM version for use in NodeJS and browsers is also available.
 import * as corn from 'libcorn';
 
 const parsed = corn.parse('{foo = "bar"}');
-console.log(parsed.value) // { foo: "bar" }
+console.log(parsed) // { foo: "bar" }
 ```
 
 ## Writing Corn
@@ -84,7 +91,8 @@ console.log(parsed.value) // { foo: "bar" }
 
 All Corn files must contain a top-level object that contains keys/values.
 
-Keys do not require quotes around them. The first character in the key cannot be whilespace, a number or any of the following characters: `. - " $ { [ =`.
+Keys do not require quotes around them. The first character in the key cannot be whitespace, 
+a number or any of the following characters: `. - " $ { [ =`.
 The remaining characters can be any unicode character except whitespace and the following:  `. =`.
 
 
@@ -493,7 +501,7 @@ At the moment Corn is in very early stages. If you'd like to help out, I'd absol
 
 ### Running Tests
 
-You must set `CORN_TEST=foobar` as this is required for the environment variable tests.
+You must set `CORN_TEST=bar` as this is required for the environment variable tests.
 
 ### WASM
 

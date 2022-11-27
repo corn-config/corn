@@ -1,5 +1,7 @@
 use colored::*;
-use libcorn::error::{Error as CornError, FileReadError, InputResolveError, SerializationError};
+use libcorn::error::{
+    DeserializationError, Error as CornError, FileReadError, InputResolveError, SerializationError,
+};
 use libcorn::Rule;
 use pest::error::{ErrorVariant, LineColLocation};
 use std::fmt::{Display, Formatter};
@@ -36,6 +38,10 @@ impl ExitCode for FileReadError {
 
 impl ExitCode for SerializationError {
     const EXIT_CODE: i32 = 4;
+}
+
+impl ExitCode for DeserializationError {
+    const EXIT_CODE: i32 = 5;
 }
 
 impl std::error::Error for Error {}
@@ -83,6 +89,7 @@ impl Error {
         match self {
             Error::Corn(CornError::ParserError(_)) => pest::error::Error::EXIT_CODE,
             Error::Corn(CornError::InputResolveError(_)) => pest::error::Error::EXIT_CODE,
+            Error::Corn(CornError::DeserializationError(_)) => DeserializationError::EXIT_CODE,
             Error::ReadingFile(_) => FileReadError::EXIT_CODE,
             Error::Serializing(_) => SerializationError::EXIT_CODE,
         }

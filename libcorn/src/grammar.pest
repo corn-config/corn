@@ -12,9 +12,11 @@ array = {
 pair = { path ~ "=" ~ value }
 
 path = ${
-    path_char+
-    ~ ( "." ~ path_char+ )*
+    path_seg
+    ~ ( "." ~ path_seg )*
 }
+
+path_seg = ${ path_char + }
 
 path_char = { !( WHITESPACE | "=" | "." ) ~ ANY }
 
@@ -24,8 +26,10 @@ boolean = { "true" | "false" }
 null = { "null" }
 
 string = ${
-  "\"" ~ char* ~ "\""
+  "\"" ~ string_val ~ "\""
 }
+
+string_val = ${ char* }
 
 char = {
 //     input

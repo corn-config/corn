@@ -1,11 +1,13 @@
 use serde::Serialize;
 use std::collections::{BTreeMap, HashMap};
 
+pub use crate::de::from_str;
 pub use crate::parser::{parse, Rule};
 
 pub mod error;
 mod parser;
 
+mod de;
 #[cfg(feature = "wasm")]
 mod wasm;
 
@@ -16,21 +18,22 @@ pub type Inputs<'a> = HashMap<&'a str, Value<'a>>;
 #[derive(Serialize, Debug, Clone)]
 #[serde(untagged)]
 pub enum Value<'a> {
-    // #[serde(serialize_with = "toml::ser::tables_last")]
-    // #[serde(serialize_with = "serialize")]
+    /// Key/value map. Values can be mixed types.
     Object(BTreeMap<&'a str, Value<'a>>),
+    /// Array of values, can be mixed types.
     Array(Vec<Value<'a>>),
-    String(String),
+    /// Borrowed string, from string literal or input.
+    String(&'a str),
+    /// Owned string, originating from an environment variable.
+    EnvString(String),
+    /// 64-bit signed integer.
     Integer(i64),
+    /// 64-bit (double precision) floating point number.
     Float(f64),
+    /// true or false
     Boolean(bool),
+    /// `null` literal.
     Null(Option<()>),
-}
-
-#[derive(Serialize, Debug)]
-pub struct Config<'a> {
-    pub inputs: Inputs<'a>,
-    pub value: Value<'a>,
 }
 
 #[derive(Serialize, Debug, Clone)]
@@ -75,7 +78,8 @@ impl From<Value<'_>> for TomlValue {
                     .collect();
                 TomlValue::Array(arr)
             }
-            Value::String(val) => TomlValue::String(val),
+            Value::String(val) => TomlValue::String(val.to_string()),
+            Value::EnvString(val) => TomlValue::String(val),
             Value::Integer(val) => TomlValue::Integer(val),
             Value::Float(val) => TomlValue::Float(val),
             Value::Boolean(val) => TomlValue::Boolean(val),

@@ -16,7 +16,7 @@ macro_rules! generate_eq_tests {
                     let valid = fs::read_to_string(format!("../assets/outputs/json/{}.json", test_name)).unwrap().replace("\r", "");
 
                     let config = parse(input.as_str()).unwrap();
-                    let serialized = serde_json::to_string_pretty(&config.value).unwrap().replace("\r", "");
+                    let serialized = serde_json::to_string_pretty(&config).unwrap().replace("\r", "");
 
                     assert_eq!(serialized.trim(), valid.trim());
                 }
@@ -29,7 +29,7 @@ macro_rules! generate_eq_tests {
                     let valid = fs::read_to_string(format!("../assets/outputs/yaml/{}.yml", test_name)).unwrap().replace("\r", "");
 
                     let config = parse(input.as_str()).unwrap();
-                    let serialized = serde_yaml::to_string(&config.value).unwrap().replace("\r", "");
+                    let serialized = serde_yaml::to_string(&config).unwrap().replace("\r", "");
 
                     assert_eq!(serialized.trim(), valid.trim());
                 }
@@ -42,7 +42,7 @@ macro_rules! generate_eq_tests {
                     let valid = fs::read_to_string(format!("../assets/outputs/toml/{}.toml", test_name)).unwrap().replace("\r", "");
 
                     let config = parse(input.as_str()).unwrap();
-                    let value = TomlValue::from(config.value);
+                    let value = TomlValue::from(config);
 
                     let serialized = toml::to_string_pretty(&value).unwrap().replace("\r", "");
 
@@ -71,26 +71,29 @@ macro_rules! generate_invalid_tests {
 }
 
 generate_eq_tests!(
+    array,
     basic,
     basic_empty_let,
-    string,
-    integer,
-    float,
     boolean,
-    null,
-    object,
-    array,
-    input,
-    environment_variable,
     chained,
     chained_complex,
-    compact,
-    very_compact,
+    char,
     comment,
+    compact,
     complex,
-    readme_example,
+    complex_keys,
+    environment_variable,
+    float,
+    input,
+    integer,
+    mixed_array,
+    null,
+    object,
     object_in_array,
-    value_after_table
+    readme_example,
+    string,
+    value_after_table,
+    very_compact
 );
 
 generate_invalid_tests!(invalid, invalid_input);

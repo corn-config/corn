@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-export CORN_TEST=foobar
+export CORN_TEST=bar
 
 rm -rf assets/outputs
 mkdir -p assets/outputs/{json,yaml,toml}
