@@ -55,7 +55,7 @@ jobs:
         command: test
         args: --profile release
       env:
-        CORN_TEST: foobar
+        CORN_TEST: bar
 
     - name: Wasm-Pack Test
       # wasm-pack doesn't seem to work on the windows images
