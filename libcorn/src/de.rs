@@ -24,12 +24,12 @@ impl<'de> Deserializer<'de> {
     }
 }
 
-pub fn from_str<'a, T>(s: &'a str) -> T
+pub fn from_str<'de, T>(s: &'de str) -> Result<T>
 where
-    T: Deserialize<'a>,
+    T: Deserialize<'de>,
 {
-    let mut deserializer = Deserializer::from_str(s).unwrap();
-    T::deserialize(&mut deserializer).unwrap()
+    let mut deserializer = Deserializer::from_str(s)?;
+    Ok(T::deserialize(&mut deserializer)?)
 }
 
 macro_rules! get_value {
