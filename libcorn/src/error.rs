@@ -36,6 +36,12 @@ impl From<pest::error::Error<Rule>> for Error {
     }
 }
 
+impl From<DeserializationError> for Error {
+    fn from(err: DeserializationError) -> Self {
+        Self::DeserializationError(err)
+    }
+}
+
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match self {

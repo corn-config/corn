@@ -3,7 +3,7 @@ use std::collections::VecDeque;
 use serde::de::{DeserializeSeed, EnumAccess, IntoDeserializer, VariantAccess, Visitor};
 use serde::{de, Deserialize};
 
-use crate::error::{DeserializationError, Result};
+use crate::error::{DeserializationError, Error, Result};
 use crate::parse;
 use crate::Value;
 
@@ -30,6 +30,18 @@ where
 {
     let mut deserializer = Deserializer::from_str(s)?;
     Ok(T::deserialize(&mut deserializer)?)
+}
+
+pub fn from_slice<'de, T>(bytes: &'de [u8]) -> Result<T>
+where
+    T: de::Deserialize<'de>,
+{
+    match std::str::from_utf8(bytes) {
+        Ok(s) => from_str(s),
+        Err(e) => Err(Error::DeserializationError(DeserializationError(
+            e.to_string(),
+        ))),
+    }
 }
 
 macro_rules! get_value {
