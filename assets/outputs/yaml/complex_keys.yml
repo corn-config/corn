@@ -1,5 +1,9 @@
 '!"£$%^&*()_': 3
-'12345': 4
+apple-pie:
+  crust: yum
+foo:
+  bar-baz: hello
+j12345: 4
 with-dash: 1
 with_underscore: 0
 "with_\U0001F33D": 2

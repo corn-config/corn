@@ -1,0 +1,13 @@
+{
+  "!\"£$%^&*()_": 3,
+  "apple-pie": {
+    "crust": "yum"
+  },
+  "foo": {
+    "bar-baz": "hello"
+  },
+  "j12345": 4,
+  "with-dash": 1,
+  "with_underscore": 0,
+  "with_🌽": 2
+}
