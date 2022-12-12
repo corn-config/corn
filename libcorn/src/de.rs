@@ -55,6 +55,25 @@ macro_rules! get_value {
     };
 }
 
+macro_rules! err_expected {
+    ($expected:literal, $got:expr) => {
+        Err(DeserializationError(format!(
+            "Expected {}, found '{:?}'",
+            $expected, $got
+        )))
+    };
+}
+
+macro_rules! match_value {
+    ($self:ident, $name:literal, $($pat:pat => $expr:expr)+) => {{
+        let value = get_value!($self);
+        match value {
+            $($pat => $expr, )+
+            _ => err_expected!($name, value)
+        }
+    }};
+}
+
 impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
     type Error = DeserializationError;
 
@@ -85,145 +104,97 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
     where
         V: Visitor<'de>,
     {
-        let value = self.value.take().unwrap();
-        match value {
-            Value::Boolean(val) => visitor.visit_bool(val),
-            _ => unreachable!(),
-        }
+        match_value!(self, "boolean", Value::Boolean(val) => visitor.visit_bool(val))
     }
 
     fn deserialize_i8<V>(self, visitor: V) -> std::result::Result<V::Value, Self::Error>
     where
         V: Visitor<'de>,
     {
-        let value = get_value!(self);
-        match value {
-            Value::Integer(val) => visitor.visit_i8(val as i8),
-            _ => unreachable!(),
-        }
+        match_value!(self, "integer (i8)", Value::Integer(val) =>  visitor.visit_i8(val as i8))
     }
 
     fn deserialize_i16<V>(self, visitor: V) -> std::result::Result<V::Value, Self::Error>
     where
         V: Visitor<'de>,
     {
-        let value = get_value!(self);
-        match value {
-            Value::Integer(val) => visitor.visit_i16(val as i16),
-            _ => unreachable!(),
-        }
+        match_value!(self, "integer (i16)", Value::Integer(val) =>  visitor.visit_i16(val as i16))
     }
 
     fn deserialize_i32<V>(self, visitor: V) -> std::result::Result<V::Value, Self::Error>
     where
         V: Visitor<'de>,
     {
-        let value = get_value!(self);
-        match value {
-            Value::Integer(val) => visitor.visit_i32(val as i32),
-            _ => unreachable!(),
-        }
+        match_value!(self, "integer (i32)", Value::Integer(val) =>  visitor.visit_i32(val as i32))
     }
 
     fn deserialize_i64<V>(self, visitor: V) -> std::result::Result<V::Value, Self::Error>
     where
         V: Visitor<'de>,
     {
-        let value = get_value!(self);
-        match value {
-            Value::Integer(val) => visitor.visit_i64(val),
-            _ => unreachable!(),
-        }
+        match_value!(self, "integer (i64)", Value::Integer(val) =>  visitor.visit_i64(val))
     }
 
     fn deserialize_u8<V>(self, visitor: V) -> std::result::Result<V::Value, Self::Error>
     where
         V: Visitor<'de>,
     {
-        let value = get_value!(self);
-        match value {
-            Value::Integer(val) => visitor.visit_u8(val as u8),
-            _ => unreachable!(),
-        }
+        match_value!(self, "integer (u8)", Value::Integer(val) =>  visitor.visit_u8(val as u8))
     }
 
     fn deserialize_u16<V>(self, visitor: V) -> std::result::Result<V::Value, Self::Error>
     where
         V: Visitor<'de>,
     {
-        let value = get_value!(self);
-        match value {
-            Value::Integer(val) => visitor.visit_u16(val as u16),
-            _ => unreachable!(),
-        }
+        match_value!(self, "integer (u16)", Value::Integer(val) =>  visitor.visit_u16(val as u16))
     }
 
     fn deserialize_u32<V>(self, visitor: V) -> std::result::Result<V::Value, Self::Error>
     where
         V: Visitor<'de>,
     {
-        let value = get_value!(self);
-        match value {
-            Value::Integer(val) => visitor.visit_u32(val as u32),
-            _ => unreachable!(),
-        }
+        match_value!(self, "integer (u32)", Value::Integer(val) =>  visitor.visit_u32(val as u32))
     }
 
     fn deserialize_u64<V>(self, visitor: V) -> std::result::Result<V::Value, Self::Error>
     where
         V: Visitor<'de>,
     {
-        let value = get_value!(self);
-        match value {
-            Value::Integer(val) => visitor.visit_u64(val as u64),
-            _ => unreachable!(),
-        }
+        match_value!(self, "integer (u64)", Value::Integer(val) =>  visitor.visit_u64(val as u64))
     }
 
     fn deserialize_f32<V>(self, visitor: V) -> std::result::Result<V::Value, Self::Error>
     where
         V: Visitor<'de>,
     {
-        let value = get_value!(self);
-        match value {
-            Value::Float(val) => visitor.visit_f32(val as f32),
-            _ => unreachable!(),
-        }
+        match_value!(self, "float (f32)", Value::Float(val) =>  visitor.visit_f32(val as f32))
     }
 
     fn deserialize_f64<V>(self, visitor: V) -> std::result::Result<V::Value, Self::Error>
     where
         V: Visitor<'de>,
     {
-        let value = get_value!(self);
-        match value {
-            Value::Float(val) => visitor.visit_f64(val),
-            _ => unreachable!(),
-        }
+        match_value!(self, "float (f64)", Value::Float(val) =>  visitor.visit_f64(val))
     }
 
     fn deserialize_char<V>(self, visitor: V) -> std::result::Result<V::Value, Self::Error>
     where
         V: Visitor<'de>,
     {
-        let value = get_value!(self);
-        match value {
-            Value::String(value) => visitor.visit_char(value.chars().next().unwrap()),
-            Value::EnvString(value) => visitor.visit_char(value.chars().next().unwrap()),
-            _ => unreachable!(),
-        }
+        match_value!(self, "char",
+            Value::String(value) => visitor.visit_char(value.chars().next().unwrap())
+            Value::EnvString(value) => visitor.visit_char(value.chars().next().unwrap())
+        )
     }
 
     fn deserialize_str<V>(self, visitor: V) -> std::result::Result<V::Value, Self::Error>
     where
         V: Visitor<'de>,
     {
-        let value = get_value!(self);
-        match value {
-            Value::String(val) => visitor.visit_borrowed_str(val),
-            Value::EnvString(val) => visitor.visit_string(val),
-            _ => unreachable!(),
-        }
+        match_value!(self, "string",
+            Value::String(val) => visitor.visit_borrowed_str(val)
+            Value::EnvString(val) => visitor.visit_string(val)
+        )
     }
 
     fn deserialize_string<V>(self, visitor: V) -> std::result::Result<V::Value, Self::Error>
@@ -237,12 +208,10 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
     where
         V: Visitor<'de>,
     {
-        let value = get_value!(self);
-        match value {
-            Value::String(val) => visitor.visit_borrowed_bytes(val.as_bytes()),
-            Value::EnvString(val) => visitor.visit_bytes(val.as_bytes()),
-            _ => unreachable!(),
-        }
+        match_value!(self, "bytes array",
+            Value::String(val) => visitor.visit_borrowed_bytes(val.as_bytes())
+            Value::EnvString(val) => visitor.visit_bytes(val.as_bytes())
+        )
     }
 
     fn deserialize_byte_buf<V>(self, visitor: V) -> std::result::Result<V::Value, Self::Error>
@@ -298,11 +267,8 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
     {
         let value = get_value!(self);
         match value {
-            Value::Array(_) => {
-                let seq = Seq::new(value);
-                visitor.visit_seq(seq)
-            }
-            _ => unreachable!(),
+            Value::Array(_) => visitor.visit_seq(Seq::new(value)),
+            _ => err_expected!("array", value),
         }
     }
 
@@ -334,8 +300,10 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
         V: Visitor<'de>,
     {
         let value = get_value!(self);
-        let map = Map::new(value);
-        visitor.visit_map(map)
+        match value {
+            Value::Object(_) => visitor.visit_map(Map::new(value)),
+            _ => err_expected!("object", value),
+        }
     }
 
     fn deserialize_struct<V>(
@@ -364,7 +332,7 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
             Value::Object(_) => visitor.visit_enum(Enum::new(value)),
             Value::String(val) => visitor.visit_enum(val.into_deserializer()),
             Value::EnvString(val) => visitor.visit_enum(val.into_deserializer()),
-            _ => unreachable!(),
+            _ => err_expected!("object or string (enum variant)", value),
         }
     }
 
