@@ -45,7 +45,7 @@ impl From<DeserializationError> for Error {
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match self {
-            Error::ParserError(_) => writeln!(f, "An error while parsing the input file."),
+            Error::ParserError(err) => writeln!(f, "An error while parsing the input file.\n{err}"),
             Error::InputResolveError(err) => {
                 write!(f, "Input `{}` was used but not declared", err.0)
             }

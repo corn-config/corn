@@ -1,5 +1,6 @@
 use serde::Serialize;
 use std::collections::{BTreeMap, HashMap};
+use std::fmt::{Display, Formatter};
 
 pub use crate::de::{from_slice, from_str};
 pub use crate::parser::{parse, Rule};
@@ -34,6 +35,21 @@ pub enum Value<'a> {
     Boolean(bool),
     /// `null` literal.
     Null(Option<()>),
+}
+
+impl<'a> Display for Value<'a> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", match self {
+            Value::Object(_) => "object",
+            Value::Array(_) => "array",
+            Value::String(_) => "string",
+            Value::EnvString(_) => "string (from environment variable)",
+            Value::Integer(_) => "integer",
+            Value::Float(_) => "float",
+            Value::Boolean(_) => "boolean",
+            Value::Null(_) => "null"
+        })
+    }
 }
 
 #[derive(Serialize, Debug, Clone)]

@@ -1,4 +1,4 @@
-use corn_cli::error::{format_parser_err, print_err, Error, ExitCode};
+use corn_cli::error::{print_err, Error, ExitCode};
 use libcorn::error::FileReadError;
 use libcorn::{parse, TomlValue, Value};
 use std::fs::read_to_string;
@@ -40,10 +40,10 @@ fn main() {
 
             match parse(&unparsed_file) {
                 Ok(config) => match serialize(config, output_type) {
-                    Ok(serialized) => println!("{}", serialized),
-                    Err(err) => handle_err(err, unparsed_file, path),
+                    Ok(serialized) => println!("{serialized}"),
+                    Err(err) => handle_err(err),
                 },
-                Err(err) => handle_err(Corn(err), unparsed_file, path),
+                Err(err) => handle_err(Corn(err)),
             };
         }
         Err(err) => {
@@ -97,15 +97,11 @@ fn serialize(config: Value, output_type: OutputType) -> Result<String, Error> {
     }
 }
 
-fn handle_err(error: Error, unparsed_file: String, path: &Path) {
+fn handle_err(error: Error) {
     let code = error.get_exit_code();
-    let code_formatted = format!("[E{:0>4}]", code).red();
+    let code_formatted = format!("[E{code:0>4}]").red().bold();
 
-    eprintln!("{} {}", code_formatted, error.to_string().bright_red());
-
-    if let Error::Corn(libcorn::error::Error::ParserError(err)) = error {
-        eprintln!("{}", format_parser_err(*err, unparsed_file, path));
-    };
+    eprintln!("{code_formatted} {error}");
 
     exit(code);
 }

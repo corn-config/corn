@@ -3,10 +3,8 @@ use libcorn::error::{
     DeserializationError, Error as CornError, FileReadError, InputResolveError, SerializationError,
 };
 use libcorn::Rule;
-use pest::error::{ErrorVariant, LineColLocation};
 use std::fmt::{Display, Formatter};
 use std::io;
-use std::path::Path;
 
 #[derive(Debug)]
 pub enum Error {
@@ -17,8 +15,6 @@ pub enum Error {
     /// Error when serializing output
     Serializing(String),
 }
-
-type PestError = pest::error::Error<Rule>;
 
 pub trait ExitCode {
     const EXIT_CODE: i32;
@@ -73,12 +69,11 @@ impl From<toml::ser::Error> for Error {
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Error::Corn(err) => write!(f, "{}", err),
-            Error::ReadingFile(err) => write!(f, "{}", err),
+            Error::Corn(err) => write!(f, "{err}"),
+            Error::ReadingFile(err) => write!(f, "{err}"),
             Error::Serializing(err) => write!(
                 f,
-                "The input could not be serialized into the requested output format:\n\t{}",
-                err
+                "The input could not be serialized into the requested output format:\n\t{err}"
             ),
         }
     }
@@ -107,65 +102,4 @@ pub fn print_err(message: String, context: Option<String>) {
     }
 
     eprintln!("\t{}", message.red().bold());
-}
-
-/// Pretty prints a parser error,
-/// indicating where in the corn-cli source code the error occurred
-/// and the rules the parser expected in that position.
-///
-/// The output is designed to mimic the Rust compiler output.
-pub fn format_parser_err(error: PestError, file: String, path: &Path) -> String {
-    let message = match error.variant {
-        ErrorVariant::ParsingError {
-            positives,
-            negatives: _negatives,
-        } => {
-            format!(
-                "Expected one of:\n\t{}",
-                positives
-                    .iter()
-                    .map(|rule| rule.to_string())
-                    .collect::<Vec<String>>()
-                    .join(", ")
-            )
-        }
-        ErrorVariant::CustomError { message } => message,
-    }
-    .red()
-    .bold();
-
-    let pos: ((usize, usize), (usize, usize)) = match error.line_col {
-        LineColLocation::Pos((row, col)) => ((row, col), (row, col)),
-        LineColLocation::Span((row1, col1), (row2, col2)) => ((row1, col1), (row2, col2)),
-    };
-
-    let line = file.lines().nth(pos.0 .0 - 1).unwrap();
-
-    let underline: String = (0..line.len())
-        .map(|i| {
-            if i >= pos.0 .1 - 1 && i < pos.1 .1 {
-                '^'
-            } else {
-                ' '
-            }
-        })
-        .collect();
-
-    let bar = "  | ".blue();
-
-    format!(
-        "--> {path}:{start_pos}:{end_pos}\n\
-        {bar}\n\
-        {bar}{line}\n\
-        {bar}{underline}\n\
-        {bar}\n\
-        {message}",
-        bar = bar,
-        path = path.display(),
-        start_pos = pos.0 .0,
-        end_pos = pos.0 .1,
-        line = line,
-        underline = underline,
-        message = message
-    )
 }
