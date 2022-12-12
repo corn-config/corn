@@ -39,16 +39,20 @@ pub enum Value<'a> {
 
 impl<'a> Display for Value<'a> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", match self {
-            Value::Object(_) => "object",
-            Value::Array(_) => "array",
-            Value::String(_) => "string",
-            Value::EnvString(_) => "string (from environment variable)",
-            Value::Integer(_) => "integer",
-            Value::Float(_) => "float",
-            Value::Boolean(_) => "boolean",
-            Value::Null(_) => "null"
-        })
+        write!(
+            f,
+            "{}",
+            match self {
+                Value::Object(_) => "object",
+                Value::Array(_) => "array",
+                Value::String(_) => "string",
+                Value::EnvString(_) => "string (from environment variable)",
+                Value::Integer(_) => "integer",
+                Value::Float(_) => "float",
+                Value::Boolean(_) => "boolean",
+                Value::Null(_) => "null",
+            }
+        )
     }
 }
 
