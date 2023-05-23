@@ -1,0 +1,10 @@
+let {
+  $foo = { bar = "baz" }
+
+  $nums_low = [ 1 2 ]
+  $num_high = [ 3 4 ]
+} in {
+  hello = "world"
+  ..$foo
+  nums = [ ..$nums_low ..$num_high ]
+}

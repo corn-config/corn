@@ -360,6 +360,50 @@ if you need more power you should use a full language.
 That said, they hopefully provide a way of quickly viewing/changing values
 without needing to trawl through the whole file.
 
+#### Merging
+
+Somtimes you want to re-use an object or array to compose a larger object/array. 
+It is possible to achieve this by merging two together using the `..$input` spread operator.
+This allows you to spread object inputs into other objects, and array inputs into other arrays.
+
+```corn
+let {
+    $base = { foo = "bar"}
+} in {
+    ..$base
+}
+```
+
+Evaluates to:
+
+```json
+{
+    "foo": "bar"
+}
+```
+
+And with arrays:
+
+```corn
+let {
+    $low = [ 1 2 ]
+    $high = [ 3 4 ]
+} in {
+    nums = [ ..$low ..$high ]
+}
+```
+
+Evaluates to:
+
+```json
+{
+     "nums": ["1", "2", "3", "4"]
+}
+```
+
+Object keys and spreads are evaulated in the order they are written, 
+which allows you to spread a base object and then manually overwrite specific keys.
+
 ### Comments
 
 At any point you can start a comment using `//`. A comment is terminated by a newline `\n` character.

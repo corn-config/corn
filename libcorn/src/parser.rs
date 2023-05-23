@@ -89,10 +89,25 @@ impl<'a> CornParser<'a> {
     /// to form a vector of `Value`s.
     fn parse_array(&self, block: Pair<'a, Rule>) -> Result<Vec<Value<'a>>> {
         assert_eq!(block.as_rule(), Rule::array);
-        block
-            .into_inner()
-            .map(|pair| self.parse_value(pair))
-            .collect::<Result<Vec<_>>>()
+
+        let mut arr = vec![];
+
+        for pair in block.into_inner() {
+            match pair.as_rule() {
+                Rule::spread => {
+                    let input = pair.into_inner().next().unwrap();
+                    let value = self.parse_value(input)?;
+
+                    match value {
+                        Value::Array(other) => arr.extend(other),
+                        _ => unreachable!(),
+                    }
+                }
+                _ => arr.push(self.parse_value(pair)?),
+            };
+        }
+
+        Ok(arr)
     }
 
     /// Parses each key/value pair in a `Rule::object`
@@ -117,6 +132,15 @@ impl<'a> CornParser<'a> {
                         path.split('.').collect::<Vec<_>>().as_slice(),
                         value,
                     );
+                }
+                Rule::spread => {
+                    let input = pair.into_inner().next().unwrap();
+                    let value = self.parse_value(input)?;
+
+                    match value {
+                        Value::Object(other) => obj.extend(other),
+                        _ => unreachable!(),
+                    }
                 }
                 _ => unreachable!(),
             }
