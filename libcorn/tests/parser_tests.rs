@@ -92,9 +92,10 @@ generate_eq_tests!(
     object,
     object_in_array,
     readme_example,
+    spread,
     string,
     value_after_table,
     very_compact
 );
 
-generate_invalid_tests!(invalid, invalid_input);
+generate_invalid_tests!(invalid, invalid_input, invalid_spread);

@@ -2,18 +2,34 @@ WHITESPACE = _{ " " | "\t" | "\r" | "\n" }
 COMMENT = _{ "//" ~ (!"\n" ~ ANY)* }
 
 object = {
- "{" ~ pair* ~ "}"
+ "{" 
+ ~ object_value* 
+ ~ "}"
+}
+
+object_value = _{
+  pair | spread
+}
+
+spread = {
+  ".." ~ input
 }
 
 array = {
-  "[" ~ value* ~ "]"
+  "[" 
+  ~ array_value* 
+  ~ "]"
+}
+
+array_value = _{
+  value | spread
 }
 
 pair = { path ~ "=" ~ value }
 
 path = ${
-    path_seg
-    ~ ( "." ~ path_seg )*
+  path_seg
+  ~ ( "." ~ path_seg )*
 }
 
 path_seg = ${ path_char + }
@@ -33,9 +49,9 @@ string_val = ${ char* }
 
 char = {
 //     input
-    !("\"" | "\\") ~ ANY
-    | "\\" ~ ("\"" | "\\" | "/" | "b" | "f" | "n" | "r" | "t")
-    | "\\" ~ ("u" ~ ASCII_HEX_DIGIT{4})
+  !("\"" | "\\") ~ ANY
+  | "\\" ~ ("\"" | "\\" | "/" | "b" | "f" | "n" | "r" | "t")
+  | "\\" ~ ("u" ~ ASCII_HEX_DIGIT{4})
 }
 
 integer = @{
