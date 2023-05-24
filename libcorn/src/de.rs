@@ -3,7 +3,7 @@ use std::collections::VecDeque;
 use serde::de::{DeserializeSeed, EnumAccess, IntoDeserializer, VariantAccess, Visitor};
 use serde::{de, Deserialize};
 
-use crate::error::{DeserializationError, Error, Result};
+use crate::error::{Error, Result};
 use crate::parse;
 use crate::Value;
 
@@ -24,23 +24,31 @@ impl<'de> Deserializer<'de> {
     }
 }
 
+/// Attempts to deserialize the config from a string slice.
+///
+/// # Errors
+///
+/// Will return a `DeserializationError` if the config is invalid.
 pub fn from_str<'de, T>(s: &'de str) -> Result<T>
 where
     T: Deserialize<'de>,
 {
     let mut deserializer = Deserializer::from_str(s)?;
-    Ok(T::deserialize(&mut deserializer)?)
+    T::deserialize(&mut deserializer)
 }
 
+/// Attempts to deserialize the config from a byte slice.
+///
+/// # Errors
+///
+/// Will return a `DeserializationError` if the config is invalid.
 pub fn from_slice<'de, T>(bytes: &'de [u8]) -> Result<T>
 where
     T: de::Deserialize<'de>,
 {
     match std::str::from_utf8(bytes) {
         Ok(s) => from_str(s),
-        Err(e) => Err(Error::DeserializationError(DeserializationError(
-            e.to_string(),
-        ))),
+        Err(e) => Err(Error::DeserializationError(e.to_string())),
     }
 }
 
@@ -48,7 +56,7 @@ macro_rules! get_value {
     ($self:ident) => {
         match $self.value.take() {
             Some(val) => Ok(val),
-            None => Err(DeserializationError(String::from(
+            None => Err(Error::DeserializationError(String::from(
                 "Deserializer value unexpectedly `None`",
             ))),
         }?
@@ -57,7 +65,7 @@ macro_rules! get_value {
 
 macro_rules! err_expected {
     ($expected:literal, $got:expr) => {
-        Err(DeserializationError(format!(
+        Err(Error::DeserializationError(format!(
             "Expected {}, found '{:?}'",
             $expected, $got
         )))
@@ -75,7 +83,7 @@ macro_rules! match_value {
 }
 
 impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
-    type Error = DeserializationError;
+    type Error = Error;
 
     fn deserialize_any<V>(self, visitor: V) -> std::result::Result<V::Value, Self::Error>
     where
@@ -181,10 +189,17 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
     where
         V: Visitor<'de>,
     {
-        match_value!(self, "char",
-            Value::String(value) => visitor.visit_char(value.chars().next().unwrap())
-            Value::EnvString(value) => visitor.visit_char(value.chars().next().unwrap())
-        )
+        let value = get_value!(self);
+        let char = match value {
+            Value::String(value) => value.chars().next(),
+            Value::EnvString(value) => value.chars().next(),
+            _ => return err_expected!("char", value),
+        };
+
+        match char {
+            Some(char) => visitor.visit_char(char),
+            None => err_expected!("char", "empty string"),
+        }
     }
 
     fn deserialize_str<V>(self, visitor: V) -> std::result::Result<V::Value, Self::Error>
@@ -370,7 +385,7 @@ impl<'de> Map<'de> {
 }
 
 impl<'de> de::MapAccess<'de> for Map<'de> {
-    type Error = DeserializationError;
+    type Error = Error;
 
     fn next_key_seed<K>(&mut self, seed: K) -> std::result::Result<Option<K::Value>, Self::Error>
     where
@@ -388,8 +403,12 @@ impl<'de> de::MapAccess<'de> for Map<'de> {
     where
         V: DeserializeSeed<'de>,
     {
-        let value = self.values.pop_front().unwrap();
-        seed.deserialize(&mut Deserializer::from_value(value))
+        match self.values.pop_front() {
+            Some(value) => seed.deserialize(&mut Deserializer::from_value(value)),
+            None => Err(Error::DeserializationError(
+                "Expected value to exist".to_string(),
+            )),
+        }
     }
 
     fn size_hint(&self) -> Option<usize> {
@@ -413,7 +432,7 @@ impl<'de> Seq<'de> {
 }
 
 impl<'de> de::SeqAccess<'de> for Seq<'de> {
-    type Error = DeserializationError;
+    type Error = Error;
 
     fn next_element_seed<T>(
         &mut self,
@@ -446,7 +465,7 @@ impl<'de> Enum<'de> {
 }
 
 impl<'de> EnumAccess<'de> for Enum<'de> {
-    type Error = DeserializationError;
+    type Error = Error;
     type Variant = Variant<'de>;
 
     fn variant_seed<V>(self, seed: V) -> std::result::Result<(V::Value, Self::Variant), Self::Error>
@@ -459,10 +478,16 @@ impl<'de> EnumAccess<'de> for Enum<'de> {
                 Ok((value, Variant::new(None)))
             }
             Value::Object(obj) => {
-                let first_pair = obj.into_iter().next().unwrap();
-                let tag =
-                    seed.deserialize(&mut Deserializer::from_value(Value::String(first_pair.0)))?;
-                Ok((tag, Variant::new(Some(first_pair.1))))
+                let first_pair = obj.into_iter().next();
+                if let Some(first_pair) = first_pair {
+                    let tag = seed
+                        .deserialize(&mut Deserializer::from_value(Value::String(first_pair.0)))?;
+                    Ok((tag, Variant::new(Some(first_pair.1))))
+                } else {
+                    Err(Error::DeserializationError(
+                        "Cannot deserialize empty object into enum".to_string(),
+                    ))
+                }
             }
             _ => unreachable!(),
         }
@@ -480,7 +505,7 @@ impl<'de> Variant<'de> {
 }
 
 impl<'de> VariantAccess<'de> for Variant<'de> {
-    type Error = DeserializationError;
+    type Error = Error;
 
     fn unit_variant(self) -> std::result::Result<(), Self::Error> {
         Ok(())
@@ -490,7 +515,12 @@ impl<'de> VariantAccess<'de> for Variant<'de> {
     where
         T: DeserializeSeed<'de>,
     {
-        seed.deserialize(&mut Deserializer::from_value(self.value.unwrap()))
+        match self.value {
+            Some(value) => seed.deserialize(&mut Deserializer::from_value(value)),
+            None => Err(Error::DeserializationError(
+                "Expected value to exist".to_string(),
+            )),
+        }
     }
 
     fn tuple_variant<V>(self, _len: usize, visitor: V) -> std::result::Result<V::Value, Self::Error>
@@ -498,7 +528,7 @@ impl<'de> VariantAccess<'de> for Variant<'de> {
         V: Visitor<'de>,
     {
         match self.value {
-            Some(Value::Array(_)) => visitor.visit_seq(Seq::new(self.value.unwrap())),
+            Some(value) if matches!(value, Value::Array(_)) => visitor.visit_seq(Seq::new(value)),
             _ => unreachable!(),
         }
     }
@@ -512,7 +542,7 @@ impl<'de> VariantAccess<'de> for Variant<'de> {
         V: Visitor<'de>,
     {
         match self.value {
-            Some(Value::Object(_)) => visitor.visit_map(Map::new(self.value.unwrap())),
+            Some(value) if matches!(value, Value::Object(_)) => visitor.visit_map(Map::new(value)),
             _ => unreachable!(),
         }
     }
