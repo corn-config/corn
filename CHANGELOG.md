@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.7.0] - 2023-05-24
+### :sparkles: New Features
+- [`48304d4`](https://github.com/JakeStanger/corn/commit/48304d4d809c1bcb3fdedfdffe3377952ca2a767) - spread operator *(commit by [@JakeStanger](https://github.com/JakeStanger))*
+
+### :recycle: Refactors
+- [`ab1af29`](https://github.com/JakeStanger/corn/commit/ab1af29219dc82ce86e32eb466a9d24ee6f195b6) - improve error handling and code quality *(commit by [@JakeStanger](https://github.com/JakeStanger))*
+
+### :memo: Documentation Changes
+- [`2be933d`](https://github.com/JakeStanger/corn/commit/2be933dc949b4357b9938643f3abe3ff22f33e39) - update CHANGELOG.md for v0.6.1 [skip ci] *(commit by [@JakeStanger](https://github.com/JakeStanger))*
+- [`17a99d2`](https://github.com/JakeStanger/corn/commit/17a99d2d0939b4fb0e197b2ad061fe13dfdb5bb2) - **readme**: correct a few bits, add more detail *(commit by [@JakeStanger](https://github.com/JakeStanger))*
+
+
 ## [v0.6.1] - 2022-12-12
 ### :bug: Bug Fixes
 - [`b6e93b2`](https://github.com/JakeStanger/corn/commit/b6e93b202d961f51ce6c92c58a9ed30111a820af) - **lib**: deserializer not handling invalid inputs *(commit by [@JakeStanger](https://github.com/JakeStanger))*
@@ -35,3 +47,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [v0.5.0]: https://github.com/JakeStanger/corn/compare/v0.4.0...v0.5.0
 [v0.6.0]: https://github.com/JakeStanger/corn/compare/v0.5.0...v0.6.0
 [v0.6.1]: https://github.com/JakeStanger/corn/compare/v0.6.0...v0.6.1
+[v0.7.0]: https://github.com/JakeStanger/corn/compare/v0.6.1...v0.7.0
