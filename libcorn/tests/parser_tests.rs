@@ -98,4 +98,4 @@ generate_eq_tests!(
     very_compact
 );
 
-generate_invalid_tests!(invalid, invalid_input, invalid_spread);
+generate_invalid_tests!(invalid, invalid_input, invalid_nesting, invalid_spread);

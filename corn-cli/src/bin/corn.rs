@@ -1,5 +1,4 @@
 use corn_cli::error::{print_err, Error, ExitCode};
-use libcorn::error::FileReadError;
 use libcorn::{parse, TomlValue, Value};
 use std::fs::read_to_string;
 use std::path::Path;
@@ -7,9 +6,9 @@ use std::process::exit;
 
 use crate::Error::Corn;
 use clap::{Parser, ValueEnum};
-use colored::*;
+use colored::Colorize;
 
-#[derive(ValueEnum, Clone, Debug)]
+#[derive(ValueEnum, Clone, Copy, Debug)]
 enum OutputType {
     Json,
     Yaml,
@@ -41,20 +40,22 @@ fn main() {
             match parse(&unparsed_file) {
                 Ok(config) => match serialize(config, output_type) {
                     Ok(serialized) => println!("{serialized}"),
-                    Err(err) => handle_err(err),
+                    Err(err) => handle_err(&err),
                 },
-                Err(err) => handle_err(Corn(err)),
+                Err(err) => handle_err(&Corn(err)),
             };
         }
         Err(err) => {
             print_err(
-                err.to_string(),
+                &err.to_string(),
                 Some(format!(
                     "while attempting to read `{}`",
                     path.display().to_string().bold()
                 )),
             );
-            exit(FileReadError::EXIT_CODE);
+
+            let error = Error::ReadingFile(err);
+            exit(error.get_exit_code());
         }
     }
 }
@@ -97,7 +98,7 @@ fn serialize(config: Value, output_type: OutputType) -> Result<String, Error> {
     }
 }
 
-fn handle_err(error: Error) {
+fn handle_err(error: &Error) {
     let code = error.get_exit_code();
     let code_formatted = format!("[E{code:0>4}]").red().bold();
 

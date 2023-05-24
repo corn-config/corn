@@ -74,7 +74,7 @@ impl From<Value<'_>> for TomlValue {
             Value::Object(val) => {
                 let obj = val
                     .iter()
-                    .filter_map(|(k, v)| {
+                    .filter_map(|(&k, v)| {
                         if let Value::Null(_) = v {
                             None
                         } else {

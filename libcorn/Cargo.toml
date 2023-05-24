@@ -14,10 +14,11 @@ wasm = ["wasm-bindgen", "serde-wasm-bindgen", "console_error_panic_hook", "wee_a
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-pest = "2.3.0"
-pest_derive = "2.3.0"
+pest = "2.6.0"
+pest_derive = "2.6.0"
 cfg-if = "1.0.0"
 serde = { version = "1.0.133", features = ["derive"] }
+thiserror = "1.0.40"
 toml = "0.5.9" # currently required to work around toml serializing
 wasm-bindgen = { version = "0.2.83", optional = true }
 serde-wasm-bindgen = { version = "0.4.5", optional = true }
