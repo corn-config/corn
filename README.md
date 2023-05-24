@@ -6,14 +6,15 @@ Corn has been designed using inspiration from JSON and Nix to produce a language
 that's easy and intuitive to write, good for config files, and has a feature-set
 small enough you can learn it in minutes. It was born out of the following frustrations:
 
-- JSON is not a config language, despite how often people use it as one
-- TOML is good for flat structures but gets ugly quickly with deeper objects
-- YAML is far too complex and its whitespace rules make it error-prone
+- JSON is not a config language, despite how often people use it as one.
+- TOML is good for flat structures but gets ugly quickly with deeper objects.
+- YAML is far too complex and its whitespace rules make it error-prone.
+- Nix gets much closer to what I want, but it's not easy to integrate.
 
 ## What Corn Is Not
 
 Corn is not a full programming language and does not try to be. 
-There are no variables, there is no interpolation and there are no statement blocks.
+There are no dynamic variables, there is no interpolation and there are no statement blocks.
 
 Likewise, Corn is not a data exchange format. 
 Unlike JSON or YAML or TOML, you cannot serialize code back into Corn. 
@@ -22,7 +23,7 @@ Unlike JSON or YAML or TOML, you cannot serialize code back into Corn.
 
 ### As a binary
 
-Corn can be installed as an executable binary to convert files from the `.corn` format
+You can install the official Corn CLI to convert files from the `.corn` format
 into any supported output format. Currently, these are:
 
 - JSON
@@ -40,8 +41,8 @@ cargo install corn-cli
 Then simply:
 
 ```shell
-corn file.corn-cli
-corn file.corn-cli -t yaml
+corn file.corn
+corn file.corn -t yaml
 ```
 
 ### As a library
@@ -69,9 +70,12 @@ fn main() {
 ```
 
 You can also use `libcorn::parse` directly to get an AST representation of the config. 
-This can be serialized directly, which offers a faster route when converting to other formats.
+This can be serialized directly, which potentially offers greater control or a faster route when converting to other formats.
 
-A WASM version for use in NodeJS and browsers is also available.
+### JavaScript
+
+A WASM version for use in NodeJS and browsers is also available,
+which can parse Corn into valid JavaScript objects.
 
 > ⚠ Note when running under NodeJS you will require `--experimental-modules` for versions <= 16. 
 > On all versions you require `--experimental-wasm-modules`.
@@ -95,7 +99,6 @@ Keys do not require quotes around them. The first character in the key cannot be
 a number or any of the following characters: `. - " $ { [ =`.
 The remaining characters can be any unicode character except whitespace and the following:  `. =`.
 
-
 Values must be one of the following:
 
 - String
@@ -108,6 +111,8 @@ Values must be one of the following:
 - Input
 
 (More on these types below)
+
+Keys and values are separated by an equals `=`.
 
 A very basic example therefore would be:
 
@@ -229,7 +234,7 @@ pi = 3.14159
 
 #### Boolean
 
-As you'd expect.
+Either `true` or `false.
 
 ```corn
 not_false = true
@@ -305,7 +310,7 @@ foo = null
 
 Sometimes it may be useful to store some values at the top
 of the config file, and use or re-use them later on,
-or even use them to compose more complex values. Corn supports config inputs, akin to variables but they don't change.
+or even use them to compose more complex values. Corn supports config inputs, akin to variables but constant.
 
 All input names start with a dollar sign `$` followed by an alphabetic ASCII character or an underscore `_`.
 This can then be followed by any amount of alphanumeric ASCII characters or underscores.
@@ -353,12 +358,22 @@ Will output something similar to:
 }
 ```
 
-Environment variable inputs will fall back to regular inputs of the same name, allowing you to create defaults.
+If a referenced environment variable is not defined, 
+the parser will fall back to a standard input of the same name (including the `env_` prefix). 
+This allows you to create overridable defaults.
+
+```corn
+let { 
+    // will fall back to this if `FOO` is not set
+    $env_FOO = 42
+} in { 
+    foo = $env_FOO
+    bar = $env_BAR
+}
+```
 
 Inputs are intentionally quite limited as to what they can do -
 if you need more power you should use a full language. 
-That said, they hopefully provide a way of quickly viewing/changing values
-without needing to trawl through the whole file.
 
 #### Merging
 
@@ -402,7 +417,28 @@ Evaluates to:
 ```
 
 Object keys and spreads are evaulated in the order they are written, 
-which allows you to spread a base object and then manually overwrite specific keys.
+which allows you to spread a base object and then manually overwrite specific keys:
+
+```corn
+let {
+    $base = { 
+        greeting = "hello"
+        subject = "world"
+    }
+} in {
+  ..$base
+  subject = "github"
+}
+```
+
+JSON:
+
+```json
+{
+    "greeting": "hello",
+    "subject": "github"
+}
+```
 
 ### Comments
 
@@ -484,7 +520,7 @@ There are only a few exceptions to this:
 
 - An integer or float following an integer or float must be whitespace separated to tell where one ends and the next starts.
 - References to inputs must terminate with whitespace as otherwise the parser cannot tell where the name ends.
-- There must be whitespace between `key=value` assignments
+- There must be whitespace between `key=value` assignments (ie after each value and before the next key).
 
 This means the below is perfectly valid (although for general consistency and readability this is strongly not recommended):
 
