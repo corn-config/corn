@@ -18,7 +18,7 @@ enum OutputType {
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 struct Args {
-    /// Path to the input corn-cli file
+    /// Path to the input corn file
     input: String,
 
     /// The file format to output
@@ -73,27 +73,9 @@ fn get_output_type(arg: Option<OutputType>) -> OutputType {
 
 fn serialize(config: Value, output_type: OutputType) -> Result<String, Error> {
     match output_type {
-        OutputType::Json => {
-            let res = serde_json::to_string_pretty(&config);
-            match res {
-                Ok(str) => Ok(str),
-                Err(err) => Err(Error::Serializing(err.to_string())),
-            }
-        }
-        OutputType::Yaml => {
-            let res = serde_yaml::to_string(&config);
-            match res {
-                Ok(str) => Ok(str),
-                Err(err) => Err(Error::Serializing(err.to_string())),
-            }
-        }
-        OutputType::Toml => {
-            let res = toml::to_string_pretty(&config);
-            match res {
-                Ok(str) => Ok(str),
-                Err(err) => Err(Error::Serializing(err.to_string())),
-            }
-        }
+        OutputType::Json => serde_json::to_string_pretty(&config).map_err(Error::from),
+        OutputType::Yaml => serde_yaml::to_string(&config).map_err(Error::from),
+        OutputType::Toml => toml::to_string_pretty(&config).map_err(Error::from),
     }
 }
 
