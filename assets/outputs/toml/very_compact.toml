@@ -1,6 +1,6 @@
 eight = [
-    'foo',
-    'bar',
+    "foo",
+    "bar",
 ]
 eleven = [
     [],
@@ -10,11 +10,6 @@ nine = [
     true,
     false,
 ]
-ten = []
-
-[[twelve]]
-
-[[twelve]]
 
 [five]
 
@@ -23,12 +18,13 @@ bar = false
 foo = true
 
 [one]
-bar = 'foo'
-foo = 'bar'
+bar = "foo"
+foo = "bar"
 
 [seven]
 bar = []
 foo = []
+
 [six.bar]
 
 [six.foo]
@@ -36,6 +32,10 @@ foo = []
 [three]
 bar = 2.0
 foo = 1.0
+
+[[twelve]]
+
+[[twelve]]
 
 [two]
 bar = 2

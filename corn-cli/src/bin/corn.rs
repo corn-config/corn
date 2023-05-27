@@ -1,5 +1,5 @@
 use corn_cli::error::{print_err, Error, ExitCode};
-use libcorn::{parse, TomlValue, Value};
+use libcorn::{parse, Value};
 use std::fs::read_to_string;
 use std::path::Path;
 use std::process::exit;
@@ -88,8 +88,7 @@ fn serialize(config: Value, output_type: OutputType) -> Result<String, Error> {
             }
         }
         OutputType::Toml => {
-            let toml_value = TomlValue::from(config);
-            let res = toml::to_string_pretty(&toml_value);
+            let res = toml::to_string_pretty(&config);
             match res {
                 Ok(str) => Ok(str),
                 Err(err) => Err(Error::Serializing(err.to_string())),
