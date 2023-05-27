@@ -234,7 +234,7 @@ pi = 3.14159
 
 #### Boolean
 
-Either `true` or `false.
+Either `true` or `false`.
 
 ```corn
 not_false = true
@@ -553,20 +553,30 @@ And in fact, we could even go as far as to reduce that to a single line:
 ### VSCode
 
 - Basic syntax highlighting
-- Support Bracket matching and commenting
+- Support for bracket matching and commenting
 
 [extension](https://marketplace.visualstudio.com/items?itemName=JakeStanger.corn&ssr=false) | [repo](https://github.com/JakeStanger/corn-vscode)
 
 ### IntelliJ
 
 - Syntax highlighting
-- Parsing, lexing and live error checking
+- Live error checking
 - Support for bracket matching and commenting
 - Basic completion support
 - Basic refactoring support
 - Basic Formatting and code style options
 
 [extension](https://plugins.jetbrains.com/plugin/18519-corn) | [repo](https://github.com/JakeStanger/corn-intellij)
+
+### Neovim
+
+> Via [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter)
+
+- Syntax highlighting
+- Parsing and live syntax error checking
+- Support for bracket matching and commenting
+
+[parser](github.com/jakestanger/tree-sitter-corn)
 
 ## Contributing
 
