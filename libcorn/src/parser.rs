@@ -206,8 +206,8 @@ impl<'a> CornParser<'a> {
         }
     }
 
-    /// Parses the `let { } in` block at the start of files,
-    /// producing a populated `HashMap` as an output.
+    /// Parses the `let { } in` block at the start of files.
+    /// Each input is inserted into into `self.inputs`.
     fn parse_assign_block(&mut self, block: Pair<'a, Rule>) -> Result<()> {
         assert_eq!(block.as_rule(), Rule::assign_block);
 
@@ -233,8 +233,7 @@ impl<'a> CornParser<'a> {
     /// Attempts to get an input value from the `inputs` map.
     /// If the `key` starts with `$env_` the system environment variables will be consulted first.
     fn get_input(&self, key: &'a str) -> Result<Value<'a>> {
-        if key.starts_with("$env_") {
-            let env_name = key.replace("$env_", "");
+        if let Some(env_name) = key.strip_prefix("$env_") {
             let var = var(env_name);
 
             if let Ok(var) = var {
