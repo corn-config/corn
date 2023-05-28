@@ -1,15 +1,14 @@
 use corn_cli::error::{print_err, Error, ExitCode};
-use libcorn::error::FileReadError;
-use libcorn::{parse, TomlValue, Value};
+use libcorn::{parse, Value};
 use std::fs::read_to_string;
 use std::path::Path;
 use std::process::exit;
 
 use crate::Error::Corn;
 use clap::{Parser, ValueEnum};
-use colored::*;
+use colored::Colorize;
 
-#[derive(ValueEnum, Clone, Debug)]
+#[derive(ValueEnum, Clone, Copy, Debug)]
 enum OutputType {
     Json,
     Yaml,
@@ -19,7 +18,7 @@ enum OutputType {
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 struct Args {
-    /// Path to the input corn-cli file
+    /// Path to the input corn file
     input: String,
 
     /// The file format to output
@@ -41,20 +40,22 @@ fn main() {
             match parse(&unparsed_file) {
                 Ok(config) => match serialize(config, output_type) {
                     Ok(serialized) => println!("{serialized}"),
-                    Err(err) => handle_err(err),
+                    Err(err) => handle_err(&err),
                 },
-                Err(err) => handle_err(Corn(err)),
+                Err(err) => handle_err(&Corn(err)),
             };
         }
         Err(err) => {
             print_err(
-                err.to_string(),
+                &err.to_string(),
                 Some(format!(
                     "while attempting to read `{}`",
                     path.display().to_string().bold()
                 )),
             );
-            exit(FileReadError::EXIT_CODE);
+
+            let error = Error::ReadingFile(err);
+            exit(error.get_exit_code());
         }
     }
 }
@@ -72,32 +73,13 @@ fn get_output_type(arg: Option<OutputType>) -> OutputType {
 
 fn serialize(config: Value, output_type: OutputType) -> Result<String, Error> {
     match output_type {
-        OutputType::Json => {
-            let res = serde_json::to_string_pretty(&config);
-            match res {
-                Ok(str) => Ok(str),
-                Err(err) => Err(Error::Serializing(err.to_string())),
-            }
-        }
-        OutputType::Yaml => {
-            let res = serde_yaml::to_string(&config);
-            match res {
-                Ok(str) => Ok(str),
-                Err(err) => Err(Error::Serializing(err.to_string())),
-            }
-        }
-        OutputType::Toml => {
-            let toml_value = TomlValue::from(config);
-            let res = toml::to_string_pretty(&toml_value);
-            match res {
-                Ok(str) => Ok(str),
-                Err(err) => Err(Error::Serializing(err.to_string())),
-            }
-        }
+        OutputType::Json => serde_json::to_string_pretty(&config).map_err(Error::from),
+        OutputType::Yaml => serde_yaml::to_string(&config).map_err(Error::from),
+        OutputType::Toml => toml::to_string_pretty(&config).map_err(Error::from),
     }
 }
 
-fn handle_err(error: Error) {
+fn handle_err(error: &Error) {
     let code = error.get_exit_code();
     let code_formatted = format!("[E{code:0>4}]").red().bold();
 

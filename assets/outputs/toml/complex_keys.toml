@@ -5,8 +5,8 @@ with_underscore = 0
 "with_🌽" = 2
 
 [apple-pie]
-crust = 'yum'
+crust = "yum"
 
 [foo]
-bar-baz = 'hello'
+bar-baz = "hello"
 

@@ -1,8 +1,5 @@
-use colored::*;
-use libcorn::error::{
-    DeserializationError, Error as CornError, FileReadError, InputResolveError, SerializationError,
-};
-use libcorn::Rule;
+use colored::Colorize;
+use libcorn::error::Error as CornError;
 use std::fmt::{Display, Formatter};
 use std::io;
 
@@ -17,27 +14,29 @@ pub enum Error {
 }
 
 pub trait ExitCode {
-    const EXIT_CODE: i32;
+    fn get_exit_code(&self) -> i32;
 }
 
-impl ExitCode for pest::error::Error<Rule> {
-    const EXIT_CODE: i32 = 1;
+impl ExitCode for CornError {
+    fn get_exit_code(&self) -> i32 {
+        match self {
+            CornError::Io(_) => 3,
+            CornError::ParserError(_) => 1,
+            CornError::InputResolveError(_) => 2,
+            CornError::InvalidPathError(_) => 6,
+            CornError::DeserializationError(_) => 5,
+        }
+    }
 }
 
-impl ExitCode for InputResolveError {
-    const EXIT_CODE: i32 = 2;
-}
-
-impl ExitCode for FileReadError {
-    const EXIT_CODE: i32 = 3;
-}
-
-impl ExitCode for SerializationError {
-    const EXIT_CODE: i32 = 4;
-}
-
-impl ExitCode for DeserializationError {
-    const EXIT_CODE: i32 = 5;
+impl ExitCode for Error {
+    fn get_exit_code(&self) -> i32 {
+        match self {
+            Error::Corn(err) => err.get_exit_code(),
+            Error::ReadingFile(_) => 3,
+            Error::Serializing(_) => 4,
+        }
+    }
 }
 
 impl std::error::Error for Error {}
@@ -79,22 +78,10 @@ impl Display for Error {
     }
 }
 
-impl Error {
-    pub fn get_exit_code(&self) -> i32 {
-        match self {
-            Error::Corn(CornError::ParserError(_)) => pest::error::Error::EXIT_CODE,
-            Error::Corn(CornError::InputResolveError(_)) => pest::error::Error::EXIT_CODE,
-            Error::Corn(CornError::DeserializationError(_)) => DeserializationError::EXIT_CODE,
-            Error::ReadingFile(_) => FileReadError::EXIT_CODE,
-            Error::Serializing(_) => SerializationError::EXIT_CODE,
-        }
-    }
-}
-
 /// Pretty-prints `message` to `stderr`.
 /// If `context` is supplied,
 /// it will be appended to the first line.
-pub fn print_err(message: String, context: Option<String>) {
+pub fn print_err(message: &str, context: Option<String>) {
     if let Some(context) = context {
         eprintln!("{} {}:", "An error occurred".red(), context.red());
     } else {

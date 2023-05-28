@@ -5,7 +5,7 @@ use std::fmt::Formatter;
 use pest::iterators::Pair;
 use pest::Parser;
 
-use crate::error::{Error, InputResolveError, Result};
+use crate::error::{Error, Result};
 use crate::{Inputs, Value};
 
 #[derive(pest_derive::Parser)]
@@ -34,7 +34,7 @@ impl<'a> CornParser<'a> {
 
     pub fn parse(mut self, object_block: Pair<'a, Rule>) -> Result<Value> {
         if let Some(input_block) = self.input_block.take() {
-            self.parse_assign_block(input_block).unwrap()
+            self.parse_assign_block(input_block)?;
         }
 
         let value_block = self.parse_object(object_block)?;
@@ -46,10 +46,10 @@ impl<'a> CornParser<'a> {
         match pair.as_rule() {
             Rule::object => Ok(Value::Object(self.parse_object(pair)?)),
             Rule::array => Ok(Value::Array(self.parse_array(pair)?)),
-            Rule::string => Ok(Value::String(self.parse_string(pair))),
-            Rule::integer => Ok(Value::Integer(self.parse_integer(&pair))),
-            Rule::float => Ok(Value::Float(self.parse_float(&pair))),
-            Rule::boolean => Ok(Value::Boolean(self.parse_bool(&pair))),
+            Rule::string => Ok(Value::String(Self::parse_string(pair))),
+            Rule::integer => Ok(Value::Integer(Self::parse_integer(&pair))),
+            Rule::float => Ok(Value::Float(Self::parse_float(&pair))),
+            Rule::boolean => Ok(Value::Boolean(Self::parse_bool(&pair))),
             Rule::null => Ok(Value::Null(None)),
             Rule::input => {
                 let key = pair.as_str();
@@ -59,7 +59,7 @@ impl<'a> CornParser<'a> {
         }
     }
 
-    fn parse_bool(&self, pair: &Pair<'_, Rule>) -> bool {
+    fn parse_bool(pair: &Pair<'_, Rule>) -> bool {
         assert_eq!(pair.as_rule(), Rule::boolean);
         match pair.as_str() {
             "true" => true,
@@ -68,37 +68,62 @@ impl<'a> CornParser<'a> {
         }
     }
 
-    fn parse_integer(&self, pair: &Pair<'_, Rule>) -> i64 {
+    fn parse_integer(pair: &Pair<'_, Rule>) -> i64 {
         assert_eq!(pair.as_rule(), Rule::integer);
-        pair.as_str().parse().unwrap()
+        pair.as_str()
+            .parse()
+            .expect("integer rules should match valid rust integers")
     }
 
-    fn parse_float(&self, pair: &Pair<'_, Rule>) -> f64 {
+    fn parse_float(pair: &Pair<'_, Rule>) -> f64 {
         assert_eq!(pair.as_rule(), Rule::float);
-        pair.as_str().parse().unwrap()
+        pair.as_str()
+            .parse()
+            .expect("float rules should match valid rust floats")
     }
 
     /// Collects each `char` in a `Rule::string`
     /// to form a single `String`.
-    fn parse_string(&self, pair: Pair<'a, Rule>) -> &'a str {
+    fn parse_string(pair: Pair<'a, Rule>) -> &'a str {
         assert_eq!(pair.as_rule(), Rule::string);
-        pair.into_inner().next().unwrap().as_str()
+        pair.into_inner()
+            .next()
+            .expect("string rules should contain a valid string value")
+            .as_str()
     }
 
     /// Parses each rule in a `Rule::array`
     /// to form a vector of `Value`s.
     fn parse_array(&self, block: Pair<'a, Rule>) -> Result<Vec<Value<'a>>> {
         assert_eq!(block.as_rule(), Rule::array);
-        block
-            .into_inner()
-            .map(|pair| self.parse_value(pair))
-            .collect::<Result<Vec<_>>>()
+
+        let mut arr = vec![];
+
+        for pair in block.into_inner() {
+            match pair.as_rule() {
+                Rule::spread => {
+                    let input = pair
+                        .into_inner()
+                        .next()
+                        .expect("spread operators should contain an input");
+                    let value = self.parse_value(input)?;
+
+                    match value {
+                        Value::Array(other) => arr.extend(other),
+                        _ => unreachable!(),
+                    }
+                }
+                _ => arr.push(self.parse_value(pair)?),
+            };
+        }
+
+        Ok(arr)
     }
 
     /// Parses each key/value pair in a `Rule::object`
-    /// to form a BTreeMap of Values.
+    /// to form a `BTreeMap` of Values.
     ///
-    /// A BTreeMap is used to ensure keys
+    /// A `BTreeMap` is used to ensure keys
     /// always output in the same order.
     fn parse_object(&self, block: Pair<'a, Rule>) -> Result<BTreeMap<&'a str, Value<'a>>> {
         assert_eq!(block.as_rule(), Rule::object);
@@ -109,14 +134,33 @@ impl<'a> CornParser<'a> {
             match pair.as_rule() {
                 Rule::pair => {
                     let mut path_rules = pair.into_inner();
-                    let path = path_rules.next().unwrap().as_str();
-                    let value = self.parse_value(path_rules.next().unwrap())?;
+                    let path = path_rules
+                        .next()
+                        .expect("object pairs should contain a key")
+                        .as_str();
+                    let value = self.parse_value(
+                        path_rules
+                            .next()
+                            .expect("object pairs should contain a value"),
+                    )?;
 
                     obj = Self::add_at_path(
                         obj,
                         path.split('.').collect::<Vec<_>>().as_slice(),
                         value,
-                    );
+                    )?;
+                }
+                Rule::spread => {
+                    let input = pair
+                        .into_inner()
+                        .next()
+                        .expect("spread operators should contain an input");
+                    let value = self.parse_value(input)?;
+
+                    match value {
+                        Value::Object(other) => obj.extend(other),
+                        _ => unreachable!(),
+                    }
                 }
                 _ => unreachable!(),
             }
@@ -135,46 +179,50 @@ impl<'a> CornParser<'a> {
         mut obj: BTreeMap<&'a str, Value<'a>>,
         path: &[&'a str],
         value: Value<'a>,
-    ) -> BTreeMap<&'a str, Value<'a>> {
-        let (part, path_rest) = path.split_first().unwrap();
+    ) -> Result<BTreeMap<&'a str, Value<'a>>> {
+        let (part, path_rest) = path
+            .split_first()
+            .expect("paths should contain at least 1 segment");
 
         if path_rest.is_empty() {
             obj.insert(part, value);
-            return obj;
+            return Ok(obj);
         }
 
-        if !obj.contains_key(part) {
-            obj.insert(part, Value::Object(BTreeMap::new()));
-        }
-
-        let child_obj = obj.get(part).unwrap().clone(); // TODO: Not clone
+        let child_obj = obj
+            .remove(part)
+            .unwrap_or_else(|| Value::Object(BTreeMap::new()));
 
         match child_obj {
             Value::Object(map) => {
                 obj.insert(
                     part,
-                    Value::Object(Self::add_at_path(map, path_rest, value)),
+                    Value::Object(Self::add_at_path(map, path_rest, value)?),
                 );
-            }
-            _ => panic!(
-                "{} attempts to use object dot notation for a non-object type",
-                path.join(".")
-            ),
-        };
 
-        obj
+                Ok(obj)
+            }
+            _ => Err(Error::InvalidPathError(path.join("."))),
+        }
     }
 
-    /// Parses the `let { } in` block at the start of files,
-    /// producing a populated HashMap as an output.
+    /// Parses the `let { } in` block at the start of files.
+    /// Each input is inserted into into `self.inputs`.
     fn parse_assign_block(&mut self, block: Pair<'a, Rule>) -> Result<()> {
         assert_eq!(block.as_rule(), Rule::assign_block);
 
         for pair in block.into_inner() {
             let mut assign_rules = pair.into_inner();
-            let name = assign_rules.next().unwrap().as_str();
+            let name = assign_rules
+                .next()
+                .expect("input assignments should have a name")
+                .as_str();
 
-            let value = self.parse_value(assign_rules.next().unwrap())?;
+            let value = self.parse_value(
+                assign_rules
+                    .next()
+                    .expect("input assignments should have a value"),
+            )?;
 
             self.inputs.insert(name, value);
         }
@@ -185,8 +233,7 @@ impl<'a> CornParser<'a> {
     /// Attempts to get an input value from the `inputs` map.
     /// If the `key` starts with `$env_` the system environment variables will be consulted first.
     fn get_input(&self, key: &'a str) -> Result<Value<'a>> {
-        if key.starts_with("$env_") {
-            let env_name = key.replace("$env_", "");
+        if let Some(env_name) = key.strip_prefix("$env_") {
             let var = var(env_name);
 
             if let Ok(var) = var {
@@ -197,11 +244,7 @@ impl<'a> CornParser<'a> {
         if let Some(value) = self.inputs.get(key) {
             Ok(value.clone())
         } else {
-            Err(Error::InputResolveError(InputResolveError(key.to_string())))
-
-            // TODO: Only print errors & exit from binary
-            // print_err(format!("Input `{}` was used but not declared", key), None);
-            // exit(ERR_INPUT);
+            Err(Error::InputResolveError(key.to_string()))
         }
     }
 }
@@ -225,20 +268,23 @@ impl<'a> CornParser<'a> {
 ///
 /// # Errors
 ///
-/// TODO: Write about errors after improving error handling
+/// Will fail if the input contains a syntax error.
+/// Will fail if the input contains invalid Corn for another reason,
+/// including references to undefined inputs or dot-notation for non-object values.
+/// Will fail if the input cannot be deserialized for any reaon.
 ///
-///
+/// Any of the above will return a specific error type with details.
 pub fn parse(file: &str) -> Result<Value> {
     let rules = AstParser::parse(Rule::config, file);
 
     match rules {
         Ok(mut rules) => {
-            let first_block = rules.next().unwrap();
+            let first_block = rules.next().expect("should be at least 1 rule");
 
             match first_block.as_rule() {
                 Rule::assign_block => {
                     let parser = CornParser::new(Some(first_block));
-                    let object_block = rules.next().unwrap();
+                    let object_block = rules.next().expect("should always be an object block");
                     parser.parse(object_block)
                 }
                 Rule::object => {

@@ -4,6 +4,6 @@ month = 1
 year = 1970
 
 [name]
-first = 'John'
-last = 'Smith'
+first = "John"
+last = "Smith"
 

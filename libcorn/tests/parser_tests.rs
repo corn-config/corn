@@ -1,6 +1,6 @@
 extern crate core;
 
-use libcorn::{parse, TomlValue};
+use libcorn::parse;
 use paste::paste;
 use std::fs;
 
@@ -42,9 +42,7 @@ macro_rules! generate_eq_tests {
                     let valid = fs::read_to_string(format!("../assets/outputs/toml/{}.toml", test_name)).unwrap().replace("\r", "");
 
                     let config = parse(input.as_str()).unwrap();
-                    let value = TomlValue::from(config);
-
-                    let serialized = toml::to_string_pretty(&value).unwrap().replace("\r", "");
+                    let serialized = toml::to_string_pretty(&config).unwrap().replace("\r", "");
 
                     assert_eq!(serialized.trim(), valid.trim());
                 }
@@ -92,9 +90,10 @@ generate_eq_tests!(
     object,
     object_in_array,
     readme_example,
+    spread,
     string,
     value_after_table,
     very_compact
 );
 
-generate_invalid_tests!(invalid, invalid_input);
+generate_invalid_tests!(invalid, invalid_input, invalid_nesting, invalid_spread);
