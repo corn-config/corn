@@ -1,5 +1,5 @@
 let {
-  foo = 23
+  $foo = 23
 } in {
   ..$foo
 }
