@@ -47,7 +47,7 @@ impl<'a> CornParser<'a> {
             Rule::object => Ok(Value::Object(self.parse_object(pair)?)),
             Rule::array => Ok(Value::Array(self.parse_array(pair)?)),
             Rule::string => Ok(Value::String(Self::parse_string(pair))),
-            Rule::integer => Ok(Value::Integer(Self::parse_integer(&pair))),
+            Rule::integer => Ok(Value::Integer(Self::parse_integer(pair))),
             Rule::float => Ok(Value::Float(Self::parse_float(&pair))),
             Rule::boolean => Ok(Value::Boolean(Self::parse_bool(&pair))),
             Rule::null => Ok(Value::Null(None)),
@@ -68,11 +68,23 @@ impl<'a> CornParser<'a> {
         }
     }
 
-    fn parse_integer(pair: &Pair<'_, Rule>) -> i64 {
+    fn parse_integer(pair: Pair<'_, Rule>) -> i64 {
         assert_eq!(pair.as_rule(), Rule::integer);
-        pair.as_str()
-            .parse()
-            .expect("integer rules should match valid rust integers")
+        let sub_pair = pair
+            .into_inner()
+            .next()
+            .expect("integers should contain a sub-rule of their type");
+
+        match sub_pair.as_rule() {
+            Rule::decimal_integer => sub_pair
+                .as_str()
+                .replace('_', "")
+                .parse()
+                .expect("decimal integer rules should match valid rust integers"),
+            Rule::hex_integer => i64::from_str_radix(&sub_pair.as_str()[2..], 16)
+                .expect("hex integer rules contain valid hex values"),
+            _ => unreachable!(),
+        }
     }
 
     fn parse_float(pair: &Pair<'_, Rule>) -> f64 {

@@ -54,9 +54,17 @@ char = {
   | "\\" ~ ("u" ~ ASCII_HEX_DIGIT{4})
 }
 
-integer = @{
-  "-"?
-  ~ ("0" | ASCII_NONZERO_DIGIT ~ ASCII_DIGIT*)
+integer = ${
+  hex_integer | decimal_integer
+}
+
+decimal_integer = @{
+    "-"?
+  ~ ("0" | ASCII_NONZERO_DIGIT ~ ("_"? ~ ASCII_DIGIT)*)
+}
+
+hex_integer = @{
+    "0x" ~ ASCII_HEX_DIGIT+
 }
 
 float = @{

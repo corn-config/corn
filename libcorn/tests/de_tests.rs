@@ -287,6 +287,8 @@ struct InputDob {
 #[derive(Deserialize, Debug, PartialEq)]
 struct Integer {
     foo: i64,
+    bar: i64,
+    baz: i64,
 }
 
 #[derive(Deserialize, Debug, PartialEq)]
