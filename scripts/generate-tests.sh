@@ -10,7 +10,7 @@ for file in assets/inputs/*; do
 
   echo "$basename"
 
-  cargo run -- "$file" -t json > assets/outputs/json/"$basename".json
-  cargo run -- "$file" -t yaml > assets/outputs/yaml/"$basename".yml
-  cargo run -- "$file" -t toml > assets/outputs/toml/"$basename".toml
+  cargo run --bin corn -- "$file" -t json > assets/outputs/json/"$basename".json
+  cargo run --bin corn -- "$file" -t yaml > assets/outputs/yaml/"$basename".yml
+  cargo run --bin corn -- "$file" -t toml > assets/outputs/toml/"$basename".toml
 done
