@@ -1,2 +1,7 @@
+bar = """
+\"\\
+\r\t"""
+baz = "a"
 foo = "bar"
+qux = ""
 

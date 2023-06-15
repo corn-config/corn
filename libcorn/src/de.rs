@@ -1,7 +1,7 @@
+use std::borrow::Cow;
 use std::collections::VecDeque;
 
-use serde::de::{DeserializeSeed, EnumAccess, IntoDeserializer, VariantAccess, Visitor};
-use serde::{de, Deserialize};
+use serde::de::{self, DeserializeSeed, EnumAccess, IntoDeserializer, VariantAccess, Visitor};
 
 use crate::error::{Error, Result};
 use crate::parse;
@@ -29,9 +29,9 @@ impl<'de> Deserializer<'de> {
 /// # Errors
 ///
 /// Will return a `DeserializationError` if the config is invalid.
-pub fn from_str<'de, T>(s: &'de str) -> Result<T>
+pub fn from_str<T>(s: &str) -> Result<T>
 where
-    T: Deserialize<'de>,
+    T: de::DeserializeOwned,
 {
     let mut deserializer = Deserializer::from_str(s)?;
     T::deserialize(&mut deserializer)
@@ -42,9 +42,9 @@ where
 /// # Errors
 ///
 /// Will return a `DeserializationError` if the config is invalid.
-pub fn from_slice<'de, T>(bytes: &'de [u8]) -> Result<T>
+pub fn from_slice<T>(bytes: &[u8]) -> Result<T>
 where
-    T: de::Deserialize<'de>,
+    T: de::DeserializeOwned,
 {
     match std::str::from_utf8(bytes) {
         Ok(s) => from_str(s),
@@ -99,8 +99,7 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
                 let seq = Seq::new(value);
                 visitor.visit_seq(seq)
             }
-            Value::String(val) => visitor.visit_borrowed_str(val),
-            Value::EnvString(val) => visitor.visit_string(val),
+            Value::String(val) => visitor.visit_str(&val),
             Value::Integer(val) => visitor.visit_i64(val),
             Value::Float(val) => visitor.visit_f64(val),
             Value::Boolean(val) => visitor.visit_bool(val),
@@ -192,7 +191,6 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
         let value = get_value!(self);
         let char = match value {
             Value::String(value) => value.chars().next(),
-            Value::EnvString(value) => value.chars().next(),
             _ => return err_expected!("char", value),
         };
 
@@ -207,8 +205,7 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
         V: Visitor<'de>,
     {
         match_value!(self, "string",
-            Value::String(val) => visitor.visit_borrowed_str(val)
-            Value::EnvString(val) => visitor.visit_string(val)
+            Value::String(val) => visitor.visit_str(&val)
         )
     }
 
@@ -224,8 +221,7 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
         V: Visitor<'de>,
     {
         match_value!(self, "bytes array",
-            Value::String(val) => visitor.visit_borrowed_bytes(val.as_bytes())
-            Value::EnvString(val) => visitor.visit_bytes(val.as_bytes())
+            Value::String(val) => visitor.visit_bytes(val.as_bytes())
         )
     }
 
@@ -346,7 +342,6 @@ impl<'de, 'a> de::Deserializer<'de> for &'a mut Deserializer<'de> {
         match value {
             Value::Object(_) => visitor.visit_enum(Enum::new(value)),
             Value::String(val) => visitor.visit_enum(val.into_deserializer()),
-            Value::EnvString(val) => visitor.visit_enum(val.into_deserializer()),
             _ => err_expected!("object or string (enum variant)", value),
         }
     }
@@ -376,7 +371,7 @@ impl<'de> Map<'de> {
             Value::Object(values) => Self {
                 values: values
                     .into_iter()
-                    .flat_map(|(key, value)| vec![Value::String(key), value])
+                    .flat_map(|(key, value)| vec![Value::String(Cow::Borrowed(key)), value])
                     .collect(),
             },
             _ => unreachable!(),
@@ -473,15 +468,15 @@ impl<'de> EnumAccess<'de> for Enum<'de> {
         V: DeserializeSeed<'de>,
     {
         match self.value {
-            Value::String(_) | Value::EnvString(_) => {
+            Value::String(_) => {
                 let value = seed.deserialize(&mut Deserializer::from_value(self.value))?;
                 Ok((value, Variant::new(None)))
             }
             Value::Object(obj) => {
                 let first_pair = obj.into_iter().next();
                 if let Some(first_pair) = first_pair {
-                    let tag = seed
-                        .deserialize(&mut Deserializer::from_value(Value::String(first_pair.0)))?;
+                    let value = Value::String(Cow::Borrowed(first_pair.0));
+                    let tag = seed.deserialize(&mut Deserializer::from_value(value))?;
                     Ok((tag, Variant::new(Some(first_pair.1))))
                 } else {
                     Err(Error::DeserializationError(

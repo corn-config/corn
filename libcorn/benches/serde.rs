@@ -1,23 +1,21 @@
-use libcorn::from_str;
+use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use paste::paste;
 use serde::Deserialize;
-use std::fs;
 
-macro_rules! generate_eq_tests {
+macro_rules! generate_benches {
     ($(($test_name:ident, $test_type:ty)),+) => {
         $(
             paste! {
-                #[test]
-                fn $test_name() {
-                    let test_name = stringify!($test_name);
+                fn [<corn_ $test_name>](_: ()) -> bool {
+                    let input = include_str!(concat!("../../assets/inputs/", stringify!($test_name), ".corn"));
+                    let output = libcorn::from_str::<$test_type>(&input);
+                    output.is_ok()
+                }
 
-                    let input = fs::read_to_string(format!("../assets/inputs/{test_name}.corn")).unwrap();
-                    let config = from_str::<$test_type>(&input).unwrap();
-
-                    let json_input = fs::read_to_string(format!("../assets/outputs/json/{test_name}.json")).unwrap();
-                    let json_config = serde_json::from_str(&json_input).unwrap();
-
-                    assert_eq!(config, json_config);
+                fn [<json_ $test_name>](_: ()) -> bool {
+                    let input = include_str!(concat!("../../assets/outputs/json/", stringify!($test_name), ".json"));
+                    let output = serde_json::from_str::<$test_type>(&input);
+                    output.is_ok()
                 }
             }
         )+
@@ -69,9 +67,8 @@ struct Boolean {
 }
 
 #[derive(Deserialize, Debug, PartialEq)]
-struct Bytes {
-    #[serde(with = "serde_bytes")]
-    foo: Vec<u8>,
+struct Bytes<'a> {
+    foo: &'a [u8],
 }
 
 #[derive(Deserialize, Debug, PartialEq)]
@@ -289,8 +286,6 @@ struct InputDob {
 #[derive(Deserialize, Debug, PartialEq)]
 struct Integer {
     foo: i64,
-    bar: i64,
-    baz: i64,
 }
 
 #[derive(Deserialize, Debug, PartialEq)]
@@ -408,12 +403,17 @@ struct ReadmeExampleScripts {
 }
 
 #[derive(Deserialize, Debug, PartialEq)]
+struct Str<'a> {
+    foo: &'a str,
+}
+
+#[derive(Deserialize, Debug, PartialEq)]
 struct ValueAfterTable {
     foo: Empty,
     qux: bool,
 }
 
-generate_eq_tests!(
+generate_benches!(
     (array, Array),
     (basic, Basic),
     (basic_empty_let, Basic),
@@ -438,119 +438,54 @@ generate_eq_tests!(
     (string, String_),
     (string_interpolation, Basic),
     (value_after_table, ValueAfterTable),
-    (very_compact, Compact)
+    (very_compact, Compact) // (basic_new_type_enum, BasicNewTypeEnum),
+                            // (basic_unit_enum, BasicUnitEnum),
+                            // (basic_new_type, BasicNewType),
+                            // (bytes, Bytes),
+                            // (chained_enum, ChainedEnum),
+                            // (mixed_array_enum, MixedArrayEnum),
+                            // (null_option, NullOption),
+                            // (null_unit, NullUnit),
+                            // (str, Str)
 );
 
-// TODO: Several of these can use the macro, tidy
+fn criterion_benchmark(c: &mut Criterion) {
+    macro_rules! bench {
+        ($name:literal) => {{
+            let mut group = c.benchmark_group($name);
 
-#[test]
-fn basic_new_type_enum() {
-    let test_name = "basic";
+            group.bench_function("corn", |b| b.iter(|| paste!([<corn_$name>])(black_box(()))));
+            group.bench_function("json", |b| b.iter(|| paste!([<json_$name>])(black_box(()))));
+            group.finish();
+        }};
+    }
 
-    let input = fs::read_to_string(format!("../assets/inputs/{test_name}.corn")).unwrap();
-    let config = from_str::<BasicNewTypeEnum>(&input).unwrap();
-
-    let json_input =
-        fs::read_to_string(format!("../assets/outputs/json/{test_name}.json")).unwrap();
-    let json_config = serde_json::from_str(&json_input).unwrap();
-
-    assert_eq!(config, json_config);
+    bench!("array");
+    bench!("basic");
+    bench!("basic_empty_let");
+    bench!("boolean");
+    bench!("chained");
+    bench!("chained_complex");
+    bench!("char");
+    bench!("comment");
+    bench!("compact");
+    bench!("complex");
+    bench!("complex_keys");
+    bench!("environment_variable");
+    bench!("float");
+    bench!("input");
+    bench!("input_references_input");
+    bench!("integer");
+    bench!("mixed_array");
+    bench!("null");
+    bench!("object");
+    bench!("object_in_array");
+    bench!("readme_example");
+    bench!("string");
+    bench!("string_interpolation");
+    bench!("value_after_table");
+    bench!("very_compact");
 }
 
-#[test]
-fn basic_unit_enum() {
-    let test_name = "basic";
-
-    let input = fs::read_to_string(format!("../assets/inputs/{test_name}.corn")).unwrap();
-    let config = from_str::<BasicUnitEnum>(&input).unwrap();
-
-    let json_input =
-        fs::read_to_string(format!("../assets/outputs/json/{test_name}.json")).unwrap();
-    let json_config = serde_json::from_str(&json_input).unwrap();
-
-    assert_eq!(config, json_config);
-}
-
-#[test]
-fn basic_new_type() {
-    let test_name = "basic";
-
-    let input = fs::read_to_string(format!("../assets/inputs/{test_name}.corn")).unwrap();
-    let config = from_str::<BasicNewType>(&input).unwrap();
-
-    let json_input =
-        fs::read_to_string(format!("../assets/outputs/json/{test_name}.json")).unwrap();
-    let json_config = serde_json::from_str(&json_input).unwrap();
-
-    assert_eq!(config, json_config);
-}
-
-#[test]
-fn bytes() {
-    let test_name = "basic";
-
-    let input = fs::read_to_string(format!("../assets/inputs/{test_name}.corn")).unwrap();
-    let config = from_str::<Bytes>(&input).unwrap();
-
-    let json_input =
-        fs::read_to_string(format!("../assets/outputs/json/{test_name}.json")).unwrap();
-    let json_config = serde_json::from_str(&json_input).unwrap();
-
-    assert_eq!(config, json_config);
-}
-
-#[test]
-fn chained_enum() {
-    let test_name = "chained";
-
-    let input = fs::read_to_string(format!("../assets/inputs/{test_name}.corn")).unwrap();
-    let config = from_str::<ChainedEnum>(&input).unwrap();
-
-    let json_input =
-        fs::read_to_string(format!("../assets/outputs/json/{test_name}.json")).unwrap();
-    let json_config = serde_json::from_str(&json_input).unwrap();
-
-    assert_eq!(config, json_config);
-}
-
-#[test]
-fn mixed_array_enum() {
-    let test_name = "mixed_array";
-
-    let input = fs::read_to_string(format!("../assets/inputs/{test_name}.corn")).unwrap();
-    let config = from_str::<MixedArrayEnum>(&input).unwrap();
-
-    let json_input =
-        fs::read_to_string(format!("../assets/outputs/json/{test_name}.json")).unwrap();
-    let json_config = serde_json::from_str(&json_input).unwrap();
-
-    assert_eq!(config, json_config);
-}
-
-#[test]
-fn null_option() {
-    let test_name = "null";
-
-    let input = fs::read_to_string(format!("../assets/inputs/{test_name}.corn")).unwrap();
-    let config = from_str::<NullOption>(&input).unwrap();
-
-    let json_input =
-        fs::read_to_string(format!("../assets/outputs/json/{test_name}.json")).unwrap();
-    let json_config = serde_json::from_str(&json_input).unwrap();
-
-    assert_eq!(config, json_config);
-}
-
-#[test]
-fn null_unit() {
-    let test_name = "null";
-
-    let input = fs::read_to_string(format!("../assets/inputs/{test_name}.corn")).unwrap();
-    let config = from_str::<NullUnit>(&input).unwrap();
-
-    let json_input =
-        fs::read_to_string(format!("../assets/outputs/json/{test_name}.json")).unwrap();
-    let json_config = serde_json::from_str(&json_input).unwrap();
-
-    assert_eq!(config, json_config);
-}
+criterion_group!(benches, criterion_benchmark);
+criterion_main!(benches);

@@ -1,4 +1,5 @@
 use serde::Serialize;
+use std::borrow::Cow;
 use std::collections::{BTreeMap, HashMap};
 use std::fmt::{Display, Formatter};
 
@@ -23,10 +24,8 @@ pub enum Value<'a> {
     Object(BTreeMap<&'a str, Value<'a>>),
     /// Array of values, can be mixed types.
     Array(Vec<Value<'a>>),
-    /// Borrowed string, from string literal or input.
-    String(&'a str),
-    /// Owned string, originating from an environment variable.
-    EnvString(String),
+    /// UTF-8 string
+    String(Cow<'a, str>),
     /// 64-bit signed integer.
     Integer(i64),
     /// 64-bit (double precision) floating point number.
@@ -46,7 +45,6 @@ impl<'a> Display for Value<'a> {
                 Value::Object(_) => "object",
                 Value::Array(_) => "array",
                 Value::String(_) => "string",
-                Value::EnvString(_) => "string (from environment variable)",
                 Value::Integer(_) => "integer",
                 Value::Float(_) => "float",
                 Value::Boolean(_) => "boolean",

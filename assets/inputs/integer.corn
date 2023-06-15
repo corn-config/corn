@@ -1,3 +1,5 @@
 {
     foo = 42
+    bar = 0xfafafa
+    baz = 1_000_000
 }

@@ -19,7 +19,7 @@ favourites:
 gender: M
 name:
   first: John
-  full: $firstName $lastName
+  full: John Smith
   last: Smith
 negative:
   float: -34.34

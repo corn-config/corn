@@ -20,7 +20,7 @@ sinceYear = 2019
 
 [name]
 first = "John"
-full = "$firstName $lastName"
+full = "John Smith"
 last = "Smith"
 
 [negative]
