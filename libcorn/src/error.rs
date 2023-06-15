@@ -22,6 +22,9 @@ pub enum Error {
     #[error("attempted to spread a type that differs from its containing type")]
     InvalidSpreadError(String),
 
+    #[error("attempted to interpolate a non-string type into a string")]
+    InvalidInterpolationError(String),
+
     #[error("failed to deserialize input")]
     DeserializationError(String),
 }

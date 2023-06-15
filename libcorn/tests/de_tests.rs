@@ -69,8 +69,9 @@ struct Boolean {
 }
 
 #[derive(Deserialize, Debug, PartialEq)]
-struct Bytes<'a> {
-    foo: &'a [u8],
+struct Bytes {
+    #[serde(with = "serde_bytes")]
+    foo: Vec<u8>,
 }
 
 #[derive(Deserialize, Debug, PartialEq)]
@@ -263,6 +264,7 @@ struct ComplexKeysFoo {
 #[derive(Deserialize, Debug, PartialEq)]
 struct Float {
     foo: f64,
+    bar: f64,
 }
 
 #[derive(Deserialize, Debug, PartialEq)]
@@ -358,6 +360,14 @@ struct ReadmeExample {
 }
 
 #[derive(Deserialize, Debug, PartialEq)]
+struct String_ {
+    foo: String,
+    bar: String,
+    baz: String,
+    qux: String,
+}
+
+#[derive(Deserialize, Debug, PartialEq)]
 struct ReadmeExampleAuthor {
     email: String,
     name: String,
@@ -398,11 +408,6 @@ struct ReadmeExampleScripts {
 }
 
 #[derive(Deserialize, Debug, PartialEq)]
-struct Str<'a> {
-    foo: &'a str,
-}
-
-#[derive(Deserialize, Debug, PartialEq)]
 struct ValueAfterTable {
     foo: Empty,
     qux: bool,
@@ -430,7 +435,8 @@ generate_eq_tests!(
     (object, Object),
     (object_in_array, ObjectInArray),
     (readme_example, ReadmeExample),
-    (string, Basic),
+    (string, String_),
+    (string_interpolation, Basic),
     (value_after_table, ValueAfterTable),
     (very_compact, Compact)
 );
@@ -541,20 +547,6 @@ fn null_unit() {
 
     let input = fs::read_to_string(format!("../assets/inputs/{test_name}.corn")).unwrap();
     let config = from_str::<NullUnit>(&input).unwrap();
-
-    let json_input =
-        fs::read_to_string(format!("../assets/outputs/json/{test_name}.json")).unwrap();
-    let json_config = serde_json::from_str(&json_input).unwrap();
-
-    assert_eq!(config, json_config);
-}
-
-#[test]
-fn str() {
-    let test_name = "string";
-
-    let input = fs::read_to_string(format!("../assets/inputs/{test_name}.corn")).unwrap();
-    let config = from_str::<Str>(&input).unwrap();
 
     let json_input =
         fs::read_to_string(format!("../assets/outputs/json/{test_name}.json")).unwrap();

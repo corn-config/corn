@@ -45,12 +45,11 @@ string = ${
   "\"" ~ string_val ~ "\""
 }
 
-string_val = ${ char* }
+string_val = ${ (input | char)* }
 
 char = {
-//     input
   !("\"" | "\\") ~ ANY
-  | "\\" ~ ("\"" | "\\" | "/" | "b" | "f" | "n" | "r" | "t")
+  | "\\" ~ ("\"" | "\\" | "n" | "r" | "t")
   | "\\" ~ ("u" ~ ASCII_HEX_DIGIT{4})
 }
 

@@ -92,6 +92,7 @@ generate_eq_tests!(
     readme_example,
     spread,
     string,
+    string_interpolation,
     value_after_table,
     very_compact
 );

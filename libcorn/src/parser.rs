@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use std::collections::{BTreeMap, HashMap};
 use std::env::var;
 use std::fmt::Formatter;
@@ -46,7 +47,7 @@ impl<'a> CornParser<'a> {
         match pair.as_rule() {
             Rule::object => Ok(Value::Object(self.parse_object(pair)?)),
             Rule::array => Ok(Value::Array(self.parse_array(pair)?)),
-            Rule::string => Ok(Value::String(Self::parse_string(pair))),
+            Rule::string => Ok(Value::String(self.parse_string(pair)?)),
             Rule::integer => Ok(Value::Integer(Self::parse_integer(pair))),
             Rule::float => Ok(Value::Float(Self::parse_float(&pair))),
             Rule::boolean => Ok(Value::Boolean(Self::parse_bool(&pair))),
@@ -96,12 +97,59 @@ impl<'a> CornParser<'a> {
 
     /// Collects each `char` in a `Rule::string`
     /// to form a single `String`.
-    fn parse_string(pair: Pair<'a, Rule>) -> &'a str {
+    fn parse_string(&self, pair: Pair<'a, Rule>) -> Result<Cow<'a, str>> {
         assert_eq!(pair.as_rule(), Rule::string);
-        pair.into_inner()
+
+        let mut full_string = String::new();
+
+        let pairs = pair
+            .into_inner()
             .next()
             .expect("string rules should contain a valid string value")
-            .as_str()
+            .into_inner();
+
+        for pair in pairs {
+            match pair.as_rule() {
+                Rule::char => full_string.push(Self::parse_char(&pair)),
+                Rule::input => {
+                    let input_name = pair.as_str();
+                    let value = self.get_input(input_name)?;
+                    match value {
+                        Value::String(value) => full_string.push_str(&value),
+                        _ => return Err(Error::InvalidInterpolationError(input_name.to_string())),
+                    }
+                }
+                _ => unreachable!(),
+            };
+        }
+
+        Ok(Cow::Owned(full_string))
+    }
+
+    fn parse_char(pair: &Pair<'a, Rule>) -> char {
+        let str = pair.as_str();
+        let mut chars = str.chars();
+
+        let first_char = chars.next().expect("character to exist");
+        if first_char != '\\' {
+            return first_char;
+        }
+
+        let second_char = chars.next().expect("character to exist");
+        if second_char != 'u' {
+            return match second_char {
+                'n' => '\n',
+                'r' => '\r',
+                't' => '\t',
+                '"' => '\"',
+                '\\' => '\\',
+                _ => unreachable!(),
+            };
+        }
+
+        let num =
+            u32::from_str_radix(&str[3..], 16).expect("valid hex characters to exist after \\u");
+        char::from_u32(num).unwrap_or('\u{FFFD}')
     }
 
     /// Parses each rule in a `Rule::array`
@@ -253,7 +301,7 @@ impl<'a> CornParser<'a> {
             let var = var(env_name);
 
             if let Ok(var) = var {
-                return Ok(Value::EnvString(var));
+                return Ok(Value::String(Cow::Owned(var)));
             }
         }
 
