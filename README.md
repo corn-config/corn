@@ -211,8 +211,12 @@ let {
 
 Strings must be surrounded by double quotes. All unicode is supported.
 
+The following escape codes are supported: `\\`, `\"`, `\n`, `\r`, `\t`.
+You can also add any unicode character using a `\uXXXX` escape.
+
 ```corn
 foo = "bar"
+two_lines = "hello\nworld"
 ```
 
 #### Integer
@@ -220,16 +224,26 @@ foo = "bar"
 Integers are signed and 64 bit, meaning you can use any value
 between `-9223372036854775808` and `9223372036854775807`.
 
+You can use a single underscore `_` separator between digits in decimal values to break up larger numbers.
+
+Hexadecimal values are also supported.
+
 ```corn
 answer = 42
+big_value = 1_000_000
+color = 0xfafafa
 ```
 
 #### Float
 
 Double precision (64-bit) floats are used.
 
+Very large or very small values can be represented with an exponent `e`.
+
 ```corn
 pi = 3.14159
+very_big = 1.01e+10
+very_small = 1.01e-10
 ```
 
 #### Boolean
@@ -374,6 +388,26 @@ let {
 
 Inputs are intentionally quite limited as to what they can do -
 if you need more power you should use a full language. 
+
+#### String Interpolation
+
+String inputs can be put inside string values to interpolate their values, like so:
+
+```corn
+let {
+    $subject = "world"
+} in {
+    greeting = "hello, $subject"
+}
+```
+
+Evaluates to:
+
+```json
+{
+  "greeting": "hello, world"
+}
+```
 
 #### Merging
 
