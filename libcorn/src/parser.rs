@@ -106,11 +106,13 @@ impl<'a> CornParser<'a> {
                         .into_inner()
                         .next()
                         .expect("spread operators should contain an input");
+
+                    let input_name = input.as_str();
                     let value = self.parse_value(input)?;
 
                     match value {
                         Value::Array(other) => arr.extend(other),
-                        _ => unreachable!(),
+                        _ => return Err(Error::InvalidSpreadError(input_name.to_string())),
                     }
                 }
                 _ => arr.push(self.parse_value(pair)?),
@@ -155,11 +157,13 @@ impl<'a> CornParser<'a> {
                         .into_inner()
                         .next()
                         .expect("spread operators should contain an input");
+
+                    let input_name = input.as_str();
                     let value = self.parse_value(input)?;
 
                     match value {
                         Value::Object(other) => obj.extend(other),
-                        _ => unreachable!(),
+                        _ => return Err(Error::InvalidSpreadError(input_name.to_string())),
                     }
                 }
                 _ => unreachable!(),

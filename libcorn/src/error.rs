@@ -19,6 +19,9 @@ pub enum Error {
     #[error("attempted to use dot-notation on non-object value")]
     InvalidPathError(String),
 
+    #[error("attempted to spread a type that differs from its containing type")]
+    InvalidSpreadError(String),
+
     #[error("failed to deserialize input")]
     DeserializationError(String),
 }
