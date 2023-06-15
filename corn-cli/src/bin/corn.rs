@@ -38,7 +38,7 @@ fn main() {
             let output_type = get_output_type(args.output_type);
 
             match parse(&unparsed_file) {
-                Ok(config) => match serialize(config, output_type) {
+                Ok(config) => match serialize(&config, output_type) {
                     Ok(serialized) => println!("{serialized}"),
                     Err(err) => handle_err(&err),
                 },
@@ -71,7 +71,7 @@ fn get_output_type(arg: Option<OutputType>) -> OutputType {
     OutputType::Json
 }
 
-fn serialize(config: Value, output_type: OutputType) -> Result<String, Error> {
+fn serialize(config: &Value, output_type: OutputType) -> Result<String, Error> {
     match output_type {
         OutputType::Json => serde_json::to_string_pretty(&config).map_err(Error::from),
         OutputType::Yaml => serde_yaml::to_string(&config).map_err(Error::from),
