@@ -2,4 +2,5 @@ let {
   $foo = 23
 } in {
   ..$foo
+  bar = [ ..$foo ]
 }
