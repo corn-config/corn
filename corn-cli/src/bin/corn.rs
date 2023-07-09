@@ -1,8 +1,8 @@
 use corn_cli::error::{print_err, Error, ExitCode};
 use libcorn::{parse, Value};
-use std::fs::read_to_string;
-use std::path::Path;
+use std::io::Read;
 use std::process::exit;
+use std::{fs, io};
 
 use crate::Error::Corn;
 use clap::{Parser, ValueEnum};
@@ -18,20 +18,29 @@ enum OutputType {
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 struct Args {
-    /// Path to the input corn file
-    input: String,
+    /// Path to the input corn file. If not set, reads from stdin instead.
+    input: Option<String>,
 
     /// The file format to output
     #[clap(long = "type", short = 't', value_enum)]
     output_type: Option<OutputType>,
 }
 
+/// Reads input from file if given a path, otherwise stdin
+fn get_input(input: Option<&String>) -> io::Result<String> {
+    if let Some(input) = input {
+        fs::read_to_string(input)
+    } else {
+        let mut buffer = String::new();
+        io::stdin().read_to_string(&mut buffer)?;
+        Ok(buffer)
+    }
+}
+
 fn main() {
     let args = Args::parse();
 
-    let path = Path::new(&args.input);
-
-    let unparsed_file = read_to_string(path);
+    let unparsed_file = get_input(args.input.as_ref());
 
     match unparsed_file {
         Ok(unparsed_file) => {
@@ -50,7 +59,7 @@ fn main() {
                 &err.to_string(),
                 Some(format!(
                     "while attempting to read `{}`",
-                    path.display().to_string().bold()
+                    args.input.unwrap_or_else(|| "stdin".to_string()).bold()
                 )),
             );
 
