@@ -610,7 +610,7 @@ And in fact, we could even go as far as to reduce that to a single line:
 - Parsing and live syntax error checking
 - Support for bracket matching and commenting
 
-[parser](github.com/jakestanger/tree-sitter-corn)
+[parser](https://github.com/jakestanger/tree-sitter-corn)
 
 ## Contributing
 
