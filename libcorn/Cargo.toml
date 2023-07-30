@@ -12,6 +12,7 @@ wasm = ["wasm-bindgen", "serde-wasm-bindgen", "console_error_panic_hook", "wee_a
 bench = ["criterion"]
 
 [lib]
+name = "corn"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]

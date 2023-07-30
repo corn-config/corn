@@ -8,7 +8,7 @@ macro_rules! generate_benches {
             paste! {
                 fn [<corn_ $test_name>](_: ()) -> bool {
                     let input = include_str!(concat!("../../assets/inputs/", stringify!($test_name), ".corn"));
-                    let output = libcorn::from_str::<$test_type>(&input);
+                    let output = corn::from_str::<$test_type>(&input);
                     output.is_ok()
                 }
 

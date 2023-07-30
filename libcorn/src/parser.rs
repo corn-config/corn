@@ -238,7 +238,7 @@ impl<'a> CornParser<'a> {
     /// `path` is an array where each entry represents another object key,
     /// for example `foo.bar` is represented as `["foo", "bar"]`.
     ///
-    /// Objects are automatically created up to the required depth recursively.
+    /// Objects are created up to the required depth recursively.
     fn add_at_path(
         mut obj: BTreeMap<&'a str, Value<'a>>,
         path: &[&'a str],
@@ -320,7 +320,7 @@ impl<'a> CornParser<'a> {
 /// # Examples
 ///
 /// ```rust
-/// use libcorn::parse;
+/// use corn::parse;
 ///
 /// let corn = "{foo = 42}";
 ///

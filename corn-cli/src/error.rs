@@ -1,5 +1,5 @@
 use colored::Colorize;
-use libcorn::error::Error as CornError;
+use corn::error::Error as CornError;
 use std::fmt::{Display, Formatter};
 use std::io;
 

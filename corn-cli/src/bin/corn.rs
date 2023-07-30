@@ -1,5 +1,5 @@
+use corn::{parse, Value};
 use corn_cli::error::{print_err, Error, ExitCode};
-use libcorn::{parse, Value};
 use std::io::Read;
 use std::process::exit;
 use std::{fs, io};

@@ -1,4 +1,4 @@
-use libcorn::from_str;
+use corn::from_str;
 use paste::paste;
 use serde::Deserialize;
 use std::fs;

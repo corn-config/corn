@@ -64,7 +64,7 @@ struct Config {
 
 fn main() {
     let corn = "{foo = 42}";
-    let config = libcorn::from_str::<Config>(corn).unwrap();
+    let config = corn::from_str::<Config>(corn).unwrap();
     assert_eq!(config.foo, 42);
 }
 ```
@@ -74,10 +74,10 @@ This can be serialized directly, which potentially offers greater control or a f
 
 ### JavaScript
 
-A WASM version for use in NodeJS and browsers is also available,
+A WASM version for use in Node.js and browsers is also available,
 which can parse Corn into valid JavaScript objects.
 
-> ⚠ Note when running under NodeJS you will require `--experimental-modules` for versions <= 16. 
+> ⚠ Note when running under Node.js you will require `--experimental-modules` for versions <= 16. 
 > On all versions you require `--experimental-wasm-modules`.
 
 [npm](https://www.npmjs.com/package/libcorn)

@@ -1,6 +1,6 @@
 extern crate core;
 
-use libcorn::parse;
+use corn::parse;
 use paste::paste;
 use std::fs;
 
