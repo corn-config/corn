@@ -5,6 +5,7 @@ edition = "2021"
 license = "MIT"
 description = "Parsing engine for Corn, a simple and pain-free configuration language."
 repository = "https://github.com/JakeStanger/corn"
+categories = ["config"]
 keywords = ["configuration", "language", "wasm", "pest", "peg"]
 
 [features]

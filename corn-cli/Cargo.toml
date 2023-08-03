@@ -5,6 +5,7 @@ edition = "2021"
 license = "MIT"
 description = "CLI for Corn, A simple and pain-free configuration language."
 repository = "https://github.com/JakeStanger/corn"
+categories = ["config"]
 keywords = ["configuration", "language", "pest", "peg", "cli"]
 
 [dependencies]
