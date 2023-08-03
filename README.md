@@ -86,8 +86,35 @@ which can parse Corn into valid JavaScript objects.
 import * as corn from 'libcorn';
 
 const parsed = corn.parse('{foo = "bar"}');
-console.log(parsed) // { foo: "bar" }
+console.log(parsed) // Map(foo -> "bar")
 ```
+
+### Lua
+
+Lua support can be built into the library using __one of__ the feature flags,
+allowing you to bind directly to `libcorn.so`:
+
+- `lua51`
+- `lua52`
+- `lua53`
+- `lua54`
+- `luajit`
+- `luajit52`
+
+So long as `libcorn.so` is in Lua's module path, it can be then be used as below:
+
+```lua
+local libcorn = require("libcorn")
+local success, res = pcall(libcorn.parse, '{foo = "bar"}')
+
+if success then
+    print(res.foo) -- lua table
+else
+    print(res) -- pretty printed error
+end
+```
+
+Thanks to [A-Cloud-Ninja](https://github.com/A-Cloud-Ninja) for adding Lua support!
 
 ## Writing Corn
 
