@@ -1,8 +1,7 @@
 let {
     $entry = "dist/index.js"
     $author = { name = "John Smith" email = "mail@example.com" }
-} in
-{
+} in {
     name = "example-package"
     version = "1.0.0"
     main = $entry
