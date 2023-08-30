@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.9.0] - 2023-08-30
+### :sparkles: New Features
+- [`7b415b2`](https://github.com/JakeStanger/corn/commit/7b415b2deac4c5e1315a46940025c461f7fbc7bc) - **cli**: stdin support *(commit by [@JakeStanger](https://github.com/JakeStanger))*
+- [`848f706`](https://github.com/JakeStanger/corn/commit/848f70655a9a6ca6513e7d6e6dead1033ff1d7f6) - **libcorn**: lua support via library export *(commit by [@A-Cloud-Ninja](https://github.com/A-Cloud-Ninja))*
+
+### :bug: Bug Fixes
+- [`b0bc2fe`](https://github.com/JakeStanger/corn/commit/b0bc2fed7fea47ff76dec0067e2f1494044a1fb6) - useful info ommitted from errors *(commit by [@JakeStanger](https://github.com/JakeStanger))*
+
+### :memo: Documentation Changes
+- [`35a4a83`](https://github.com/JakeStanger/corn/commit/35a4a8399f01bfec73bf3578e8d56d4b328bc0d8) - update CHANGELOG.md for v0.8.0 [skip ci] *(commit by [@JakeStanger](https://github.com/JakeStanger))*
+- [`1a778ab`](https://github.com/JakeStanger/corn/commit/1a778ab350a27d4aa82ea2d8292066b244edcdef) - **readme**: fix link to tree-sitter parser *(commit by [@JakeStanger](https://github.com/JakeStanger))*
+- [`35c60e8`](https://github.com/JakeStanger/corn/commit/35c60e83f13bdf6b395b597c3f4b1e9436bca645) - add panic info for parser *(commit by [@JakeStanger](https://github.com/JakeStanger))*
+
+
 ## [v0.8.0] - 2023-06-18
 ### :sparkles: New Features
 - [`301ceea`](https://github.com/JakeStanger/corn/commit/301ceea0c4dafffd38f4688fcf1df6d7bfdb448b) - **parser**: add hex and underscore separator support to integers. *(commit by [@JakeStanger](https://github.com/JakeStanger))*
@@ -76,3 +90,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [v0.6.1]: https://github.com/JakeStanger/corn/compare/v0.6.0...v0.6.1
 [v0.7.0]: https://github.com/JakeStanger/corn/compare/v0.6.1...v0.7.0
 [v0.8.0]: https://github.com/JakeStanger/corn/compare/v0.7.0...v0.8.0
+[v0.9.0]: https://github.com/JakeStanger/corn/compare/v0.8.0...v0.9.0
