@@ -1,6 +1,6 @@
 [package]
 name = "corn-cli"
-version = "0.8.0"
+version = "0.9.0"
 edition = "2021"
 license = "MIT"
 description = "CLI for Corn, A simple and pain-free configuration language."
@@ -9,7 +9,7 @@ categories = ["config"]
 keywords = ["configuration", "language", "pest", "peg", "cli"]
 
 [dependencies]
-libcorn = { version = "0.8.0", path = "../libcorn" }
+libcorn = { version = "0.9.0", path = "../libcorn" }
 clap = { version = "4.0.15", features = ["derive"] }
 colored = "2.0.0"
 serde = { version = "1.0.133", features = ["derive"] }
