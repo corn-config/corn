@@ -338,6 +338,12 @@ impl<'a> CornParser<'a> {
 /// Will fail if the input cannot be deserialized for any reaon.
 ///
 /// Any of the above will return a specific error type with details.
+///
+/// # Panics
+///
+/// If the internal AST parser produces a tree in an invalid structure,
+/// the function will panic.
+/// This indicates a severe error in the library and should never occur.
 pub fn parse(file: &str) -> Result<Value> {
     let rules = AstParser::parse(Rule::config, file);
 
