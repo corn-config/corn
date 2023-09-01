@@ -14,7 +14,7 @@ small enough you can learn it in minutes. It was born out of the following frust
 ## What Corn Is Not
 
 Corn is not a full programming language and does not try to be. 
-There are no dynamic variables, there is no interpolation and there are no statement blocks.
+There are no dynamic variables, there are no operations and there are no statement blocks.
 
 Likewise, Corn is not a data exchange format. 
 Unlike JSON or YAML or TOML, you cannot serialize code back into Corn. 
@@ -435,6 +435,8 @@ Evaluates to:
   "greeting": "hello, world"
 }
 ```
+
+To use a literal dollar, you can escape with `\$`. For example, `\$subject`. 
 
 #### Merging
 
