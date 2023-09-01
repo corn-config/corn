@@ -49,7 +49,7 @@ string_val = ${ (input | char)* }
 
 char = {
   !("\"" | "\\") ~ ANY
-  | "\\" ~ ("\"" | "\\" | "n" | "r" | "t")
+  | "\\" ~ ("\"" | "\\" | "n" | "r" | "t" | "$")
   | "\\" ~ ("u" ~ ASCII_HEX_DIGIT{4})
 }
 
@@ -73,7 +73,7 @@ float = @{
   ~ (^"e" ~ ("+" | "-")? ~ ASCII_DIGIT+)?
 }
 
-input = ${ "$" ~ (ASCII_ALPHA | "_") ~ (ASCII_ALPHANUMERIC | "_")+ }
+input = ${ !"\\" ~ "$" ~ (ASCII_ALPHA | "_") ~ (ASCII_ALPHANUMERIC | "_")+ }
 
 assignment = { input ~ "=" ~ value }
 

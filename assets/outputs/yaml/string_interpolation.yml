@@ -1,2 +1,3 @@
+bar: $escaped
 foo: hello, world
 

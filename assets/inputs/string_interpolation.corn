@@ -3,4 +3,5 @@ let {
     $subject = "world"
 } in {
     foo = "$greeting, $subject"
+    bar = "\$escaped"
 }
