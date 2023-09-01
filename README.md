@@ -50,7 +50,7 @@ corn file.corn -t yaml
 Corn can be used as a Rust library to deserialize config files directly
 without needing to convert to other file formats.
 
-[crate](https://crates.io/crates/libcorn) | [docs](https://docs.rs/libcorn/latest/libcorn)
+[crate](https://crates.io/crates/libcorn) | [docs](https://docs.rs/libcorn)
 
 The recommended way to do this is using `serde` into a struct:
 
