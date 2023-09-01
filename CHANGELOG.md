@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.9.1] - 2023-09-01
+### :bug: Bug Fixes
+- [`f49f68b`](https://github.com/JakeStanger/corn/commit/f49f68b7cb3ed16a912cd45305d22c10d4e05f57) - unable to escape input in string interpolation *(commit by [@JakeStanger](https://github.com/JakeStanger))*
+
+### :memo: Documentation Changes
+- [`d848156`](https://github.com/JakeStanger/corn/commit/d848156e9f03e034322dfc0e49bed662e802eb52) - update CHANGELOG.md for v0.9.0 [skip ci] *(commit by [@JakeStanger](https://github.com/JakeStanger))*
+- [`6ae953e`](https://github.com/JakeStanger/corn/commit/6ae953e1e3d3e464b00b794390daef05cdcdfd1c) - **readme**: fix link to rust docs *(commit by [@JakeStanger](https://github.com/JakeStanger))*
+
+
 ## [v0.9.0] - 2023-08-30
 ### :sparkles: New Features
 - [`7b415b2`](https://github.com/JakeStanger/corn/commit/7b415b2deac4c5e1315a46940025c461f7fbc7bc) - **cli**: stdin support *(commit by [@JakeStanger](https://github.com/JakeStanger))*
@@ -91,3 +100,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [v0.7.0]: https://github.com/JakeStanger/corn/compare/v0.6.1...v0.7.0
 [v0.8.0]: https://github.com/JakeStanger/corn/compare/v0.7.0...v0.8.0
 [v0.9.0]: https://github.com/JakeStanger/corn/compare/v0.8.0...v0.9.0
+[v0.9.1]: https://github.com/JakeStanger/corn/compare/v0.9.0...v0.9.1
