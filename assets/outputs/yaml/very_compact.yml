@@ -1,37 +1,37 @@
+one:
+  foo: bar
+  bar: foo
+two:
+  foo: 1
+  bar: 2
+three:
+  foo: 1.0
+  bar: 2.0
+four:
+  foo: true
+  bar: false
+five:
+  foo: null
+  bar: null
+six:
+  foo: {}
+  bar: {}
+seven:
+  foo: []
+  bar: []
 eight:
 - foo
 - bar
-eleven:
-- []
-- []
-five:
-  bar: null
-  foo: null
-four:
-  bar: false
-  foo: true
 nine:
 - true
 - false
-one:
-  bar: foo
-  foo: bar
-seven:
-  bar: []
-  foo: []
-six:
-  bar: {}
-  foo: {}
 ten:
 - null
 - null
-three:
-  bar: 2.0
-  foo: 1.0
+eleven:
+- []
+- []
 twelve:
 - {}
 - {}
-two:
-  bar: 2
-  foo: 1
 

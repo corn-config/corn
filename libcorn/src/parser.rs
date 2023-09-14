@@ -1,5 +1,6 @@
+use indexmap::IndexMap;
 use std::borrow::Cow;
-use std::collections::{BTreeMap, HashMap};
+use std::collections::HashMap;
 use std::env::var;
 use std::fmt::Formatter;
 
@@ -184,14 +185,14 @@ impl<'a> CornParser<'a> {
     }
 
     /// Parses each key/value pair in a `Rule::object`
-    /// to form a `BTreeMap` of Values.
+    /// to form a `IndexMap` of Values.
     ///
-    /// A `BTreeMap` is used to ensure keys
+    /// An `IndexMap` is used to ensure keys
     /// always output in the same order.
-    fn parse_object(&self, block: Pair<'a, Rule>) -> Result<BTreeMap<&'a str, Value<'a>>> {
+    fn parse_object(&self, block: Pair<'a, Rule>) -> Result<IndexMap<&'a str, Value<'a>>> {
         assert_eq!(block.as_rule(), Rule::object);
 
-        let mut obj = BTreeMap::new();
+        let mut obj = IndexMap::new();
 
         for pair in block.into_inner() {
             match pair.as_rule() {
@@ -241,10 +242,10 @@ impl<'a> CornParser<'a> {
     ///
     /// Objects are created up to the required depth recursively.
     fn add_at_path(
-        mut obj: BTreeMap<&'a str, Value<'a>>,
+        mut obj: IndexMap<&'a str, Value<'a>>,
         path: &[&'a str],
         value: Value<'a>,
-    ) -> Result<BTreeMap<&'a str, Value<'a>>> {
+    ) -> Result<IndexMap<&'a str, Value<'a>>> {
         let (part, path_rest) = path
             .split_first()
             .expect("paths should contain at least 1 segment");
@@ -256,7 +257,7 @@ impl<'a> CornParser<'a> {
 
         let child_obj = obj
             .remove(part)
-            .unwrap_or_else(|| Value::Object(BTreeMap::new()));
+            .unwrap_or_else(|| Value::Object(IndexMap::new()));
 
         match child_obj {
             Value::Object(map) => {

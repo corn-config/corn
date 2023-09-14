@@ -1,34 +1,34 @@
 {
-  "author": {
-    "email": "mail@example.com",
-    "name": "John Smith",
-    "url": "https://example.com"
-  },
+  "name": "example-package",
+  "version": "1.0.0",
+  "main": "dist/index.js",
   "bin": {
     "filebrowser": "dist/index.js"
   },
-  "config": {
-    "hostname": null,
-    "port": 8080
+  "private": false,
+  "author": {
+    "name": "John Smith",
+    "email": "mail@example.com",
+    "url": "https://example.com"
   },
   "contributors": [
     {
-      "email": "mail@example.com",
-      "name": "John Smith"
+      "name": "John Smith",
+      "email": "mail@example.com"
     }
   ],
+  "scripts": {
+    "build": "tsc",
+    "run": "node dist"
+  },
   "dependencies": {
     "dotenv": "^8.2.0"
   },
   "devDependencies": {
     "typescript": "^4.5"
   },
-  "main": "dist/index.js",
-  "name": "example-package",
-  "private": false,
-  "scripts": {
-    "build": "tsc",
-    "run": "node dist"
-  },
-  "version": "1.0.0"
+  "config": {
+    "port": 8080,
+    "hostname": null
+  }
 }

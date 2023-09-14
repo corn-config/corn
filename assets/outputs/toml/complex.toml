@@ -1,5 +1,5 @@
 age = 32
-empty2 = []
+gender = "M"
 favourites = [
     "blue",
     "fish",
@@ -9,26 +9,26 @@ favourites = [
     false,
     { hello = "world" },
 ]
-gender = "M"
+empty2 = []
+
+[name]
+first = "John"
+last = "Smith"
+full = "John Smith"
 
 [employment]
 employed = true
 name = "Postman"
 sinceYear = 2019
 
+[parents.father.birthday]
+year = 1970
+month = 2
+day = 3
+
 [empty1]
 
-[name]
-first = "John"
-full = "John Smith"
-last = "Smith"
-
 [negative]
-float = -34.34
 int = -34
-
-[parents.father.birthday]
-day = 3
-month = 2
-year = 1970
+float = -34.34
 
