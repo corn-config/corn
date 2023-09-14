@@ -3,10 +3,10 @@
     "bar": {
       "baz": 42
     },
+    "qux": true,
     "quux": [
       "green eggs",
       "ham"
-    ],
-    "qux": true
+    ]
   }
 }

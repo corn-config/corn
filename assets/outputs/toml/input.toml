@@ -1,9 +1,9 @@
+[name]
+first = "John"
+last = "Smith"
+
 [dob]
 day = 1
 month = 1
 year = 1970
-
-[name]
-first = "John"
-last = "Smith"
 

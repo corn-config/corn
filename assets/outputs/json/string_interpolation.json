@@ -1,4 +1,4 @@
 {
-  "bar": "$escaped",
-  "foo": "hello, world"
+  "foo": "hello, world",
+  "bar": "$escaped"
 }

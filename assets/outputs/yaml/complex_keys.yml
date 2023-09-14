@@ -1,10 +1,10 @@
+with_underscore: 0
+with-dash: 1
+"with_\U0001F33D": 2
 '!"£$%^&*()_': 3
-apple-pie:
-  crust: yum
+j12345: 4
 foo:
   bar-baz: hello
-j12345: 4
-with-dash: 1
-with_underscore: 0
-"with_\U0001F33D": 2
+apple-pie:
+  crust: yum
 

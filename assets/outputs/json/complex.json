@@ -1,12 +1,26 @@
 {
+  "name": {
+    "first": "John",
+    "last": "Smith",
+    "full": "John Smith"
+  },
   "age": 32,
+  "placeholder": null,
   "employment": {
     "employed": true,
     "name": "Postman",
     "sinceYear": 2019
   },
-  "empty1": {},
-  "empty2": [],
+  "parents": {
+    "father": {
+      "birthday": {
+        "year": 1970,
+        "month": 2,
+        "day": 3
+      }
+    }
+  },
+  "gender": "M",
   "favourites": [
     "blue",
     "fish",
@@ -15,31 +29,17 @@
     4.73753,
     false,
     {
+      "hello": "world",
       "food": {
         "favourite": "egg",
         "hated": "beef"
-      },
-      "hello": "world"
-    }
-  ],
-  "gender": "M",
-  "name": {
-    "first": "John",
-    "full": "John Smith",
-    "last": "Smith"
-  },
-  "negative": {
-    "float": -34.34,
-    "int": -34
-  },
-  "parents": {
-    "father": {
-      "birthday": {
-        "day": 3,
-        "month": 2,
-        "year": 1970
       }
     }
-  },
-  "placeholder": null
+  ],
+  "empty1": {},
+  "empty2": [],
+  "negative": {
+    "int": -34,
+    "float": -34.34
+  }
 }

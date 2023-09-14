@@ -1,6 +1,7 @@
+use indexmap::IndexMap;
 use serde::Serialize;
 use std::borrow::Cow;
-use std::collections::{BTreeMap, HashMap};
+use std::collections::HashMap;
 use std::fmt::{Display, Formatter};
 
 pub use crate::de::{from_slice, from_str};
@@ -31,7 +32,7 @@ pub type Inputs<'a> = HashMap<&'a str, Value<'a>>;
 #[serde(untagged)]
 pub enum Value<'a> {
     /// Key/value map. Values can be mixed types.
-    Object(BTreeMap<&'a str, Value<'a>>),
+    Object(IndexMap<&'a str, Value<'a>>),
     /// Array of values, can be mixed types.
     Array(Vec<Value<'a>>),
     /// UTF-8 string

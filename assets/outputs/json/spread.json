@@ -1,6 +1,6 @@
 {
-  "bar": "baz",
   "hello": "world",
+  "bar": "baz",
   "nums": [
     1,
     2,

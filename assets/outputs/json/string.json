@@ -1,6 +1,6 @@
 {
+  "foo": "bar",
   "bar": "\"\\\n\r\t",
   "baz": "a",
-  "foo": "bar",
   "qux": ""
 }
