@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.9.2] - 2023-09-14
+### :bug: Bug Fixes
+- [`d124160`](https://github.com/JakeStanger/corn/commit/d124160ca425cd071ab269a5d2baf48035476798) - outputted keys not in same order as input *(commit by [@JakeStanger](https://github.com/JakeStanger))*
+
+### :memo: Documentation Changes
+- [`f39d24f`](https://github.com/JakeStanger/corn/commit/f39d24f502c7d852f482669faf78ac7fac591a91) - update CHANGELOG.md for v0.9.1 [skip ci] *(commit by [@JakeStanger](https://github.com/JakeStanger))*
+
+
 ## [v0.9.1] - 2023-09-01
 ### :bug: Bug Fixes
 - [`f49f68b`](https://github.com/JakeStanger/corn/commit/f49f68b7cb3ed16a912cd45305d22c10d4e05f57) - unable to escape input in string interpolation *(commit by [@JakeStanger](https://github.com/JakeStanger))*
@@ -101,3 +109,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [v0.8.0]: https://github.com/JakeStanger/corn/compare/v0.7.0...v0.8.0
 [v0.9.0]: https://github.com/JakeStanger/corn/compare/v0.8.0...v0.9.0
 [v0.9.1]: https://github.com/JakeStanger/corn/compare/v0.9.0...v0.9.1
+[v0.9.2]: https://github.com/JakeStanger/corn/compare/v0.9.1...v0.9.2
