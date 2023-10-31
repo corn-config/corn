@@ -1,5 +1,6 @@
 foo: bar
-bar: "\"\\\n\r\t"
+bar: |
+  "\
 baz: a
 qux: ''
 
