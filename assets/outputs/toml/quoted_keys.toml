@@ -1,0 +1,7 @@
+"foo.bar" = 42
+"with spaces" = true
+"escaped'quote" = false
+
+["green.eggs".and]
+ham = "hello world"
+

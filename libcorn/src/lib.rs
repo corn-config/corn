@@ -28,11 +28,14 @@ mod wasm;
 /// The names include their `$` prefix.
 pub type Inputs<'a> = HashMap<&'a str, Value<'a>>;
 
+/// A map of keys to their values.
+pub type Object<'a> = IndexMap<Cow<'a, str>, Value<'a>>;
+
 #[derive(Serialize, Debug, Clone)]
 #[serde(untagged)]
 pub enum Value<'a> {
     /// Key/value map. Values can be mixed types.
-    Object(IndexMap<&'a str, Value<'a>>),
+    Object(Object<'a>),
     /// Array of values, can be mixed types.
     Array(Vec<Value<'a>>),
     /// UTF-8 string

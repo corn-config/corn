@@ -1,0 +1,10 @@
+{
+  "foo.bar": 42,
+  "green.eggs": {
+    "and": {
+      "ham": "hello world"
+    }
+  },
+  "with spaces": true,
+  "escaped'quote": false
+}
