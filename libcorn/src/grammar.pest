@@ -32,9 +32,20 @@ path = ${
   ~ ( "." ~ path_seg )*
 }
 
-path_seg = ${ path_char + }
+path_seg = _{
+    quoted_path_seg | regular_path_seg
+}
 
-path_char = { !( WHITESPACE | "=" | "." ) ~ ANY }
+quoted_path_seg = ${ "'" ~ quoted_path_val ~ "'" }
+quoted_path_val = ${ quoted_path_char + }
+quoted_path_char = _{
+	!("'" | "\\") ~ ANY
+    | "\\" ~ "'"
+}
+
+regular_path_seg = ${ path_char + }
+
+path_char = _{ !( WHITESPACE | "=" | "." ) ~ ANY }
 
 value = _{ object | array | input | string | float | integer | boolean | null }
 

@@ -8,7 +8,7 @@ use pest::iterators::Pair;
 use pest::Parser;
 
 use crate::error::{Error, Result};
-use crate::{Inputs, Value};
+use crate::{Inputs, Object, Value};
 
 #[derive(pest_derive::Parser)]
 #[grammar = "grammar.pest"]
@@ -195,7 +195,7 @@ impl<'a> CornParser<'a> {
     ///
     /// An `IndexMap` is used to ensure keys
     /// always output in the same order.
-    fn parse_object(&self, block: Pair<'a, Rule>) -> Result<IndexMap<&'a str, Value<'a>>> {
+    fn parse_object(&self, block: Pair<'a, Rule>) -> Result<Object<'a>> {
         assert_eq!(block.as_rule(), Rule::object);
 
         let mut obj = IndexMap::new();
@@ -204,21 +204,20 @@ impl<'a> CornParser<'a> {
             match pair.as_rule() {
                 Rule::pair => {
                     let mut path_rules = pair.into_inner();
+
                     let path = path_rules
                         .next()
-                        .expect("object pairs should contain a key")
-                        .as_str();
+                        .expect("object pairs should contain a key");
+
+                    let paths = Self::parse_path(path);
+
                     let value = self.parse_value(
                         path_rules
                             .next()
                             .expect("object pairs should contain a value"),
                     )?;
 
-                    obj = Self::add_at_path(
-                        obj,
-                        path.split('.').collect::<Vec<_>>().as_slice(),
-                        value,
-                    )?;
+                    obj = Self::add_at_path(obj, &paths, value)?;
                 }
                 Rule::spread => {
                     let input = pair
@@ -241,6 +240,22 @@ impl<'a> CornParser<'a> {
         Ok(obj)
     }
 
+    fn parse_path(path: Pair<Rule>) -> Vec<Cow<str>> {
+        path.into_inner()
+            .map(|pair| match pair.as_rule() {
+                Rule::regular_path_seg => Cow::Borrowed(pair.as_str()),
+                Rule::quoted_path_seg => Cow::Owned(
+                    pair.into_inner()
+                        .next()
+                        .expect("quoted paths should contain an inner value")
+                        .as_str()
+                        .replace('\\', ""),
+                ),
+                _ => unreachable!(),
+            })
+            .collect::<Vec<_>>()
+    }
+
     /// Adds `Value` at the `path` in `obj`.
     ///
     /// `path` is an array where each entry represents another object key,
@@ -248,16 +263,16 @@ impl<'a> CornParser<'a> {
     ///
     /// Objects are created up to the required depth recursively.
     fn add_at_path(
-        mut obj: IndexMap<&'a str, Value<'a>>,
-        path: &[&'a str],
+        mut obj: Object<'a>,
+        path: &[Cow<'a, str>],
         value: Value<'a>,
-    ) -> Result<IndexMap<&'a str, Value<'a>>> {
+    ) -> Result<Object<'a>> {
         let (part, path_rest) = path
             .split_first()
             .expect("paths should contain at least 1 segment");
 
         if path_rest.is_empty() {
-            obj.insert(part, value);
+            obj.insert(part.clone(), value);
             return Ok(obj);
         }
 
@@ -268,7 +283,7 @@ impl<'a> CornParser<'a> {
         match child_obj {
             Value::Object(map) => {
                 obj.insert(
-                    part,
+                    part.clone(),
                     Value::Object(Self::add_at_path(map, path_rest, value)?),
                 );
 

@@ -122,9 +122,12 @@ Thanks to [A-Cloud-Ninja](https://github.com/A-Cloud-Ninja) for adding Lua suppo
 
 All Corn files must contain a top-level object that contains keys/values.
 
-Keys do not require quotes around them. The first character in the key cannot be whitespace, 
+The first character in the key cannot be whitespace, 
 a number or any of the following characters: `. - " $ { [ =`.
 The remaining characters can be any unicode character except whitespace and the following:  `. =`.
+
+Keys do not require quotes around them, although you can optionally use `single quotes` to avoid the above limitations and use any character in any position.
+Within quoted keys, you can use `\'` to escape a quote.
 
 Values must be one of the following:
 
