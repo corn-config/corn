@@ -10,7 +10,6 @@ use wasm_bindgen_test::*;
 #[wasm_bindgen]
 pub fn parse(corn: &str) -> Result<JsValue, JsValue> {
     console_error_panic_hook::set_once();
-
     let res = crate::parse(corn);
 
     match res {

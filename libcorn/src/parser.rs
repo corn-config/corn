@@ -124,6 +124,12 @@ impl<'a> CornParser<'a> {
             };
         }
 
+        let full_string = if full_string.contains('\n') {
+            trim_multiline_string(&full_string)
+        } else {
+            full_string
+        };
+
         Ok(Cow::Owned(full_string))
     }
 
@@ -313,6 +319,40 @@ impl<'a> CornParser<'a> {
             Err(Error::InputResolveError(key.to_string()))
         }
     }
+}
+
+/// Takes a multiline string and trims the maximum amount of
+/// whitespace at the start of each line
+/// while preserving formatting.
+///
+/// Based on code from `indoc` crate:
+/// <https://github.com/dtolnay/indoc/blob/60b5fa29ba4f98b479713621a1f4ec96155caaba/src/unindent.rs#L15-L51>
+
+fn trim_multiline_string(string: &str) -> String {
+    let ignore_first_line = string.starts_with('\n') || string.starts_with("\r\n");
+
+    let spaces = string
+        .lines()
+        .skip(1)
+        .map(|line| line.chars().take_while(char::is_ascii_whitespace).count())
+        .min()
+        .unwrap_or_default();
+
+    let mut result = String::with_capacity(string.len());
+    for (i, line) in string.lines().enumerate() {
+        if i > 1 || (i == 1 && !ignore_first_line) {
+            result.push('\n');
+        }
+        if i == 0 {
+            // Do not un-indent anything on same line as opening quote
+            result.push_str(line);
+        } else if line.len() > spaces {
+            // Whitespace-only lines may have fewer than the number of spaces
+            // being removed
+            result.push_str(&line[spaces..]);
+        }
+    }
+    result
 }
 
 /// Parses the input string into a `Config`
