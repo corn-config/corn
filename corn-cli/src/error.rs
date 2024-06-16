@@ -61,8 +61,8 @@ impl From<serde_yaml::Error> for Error {
     }
 }
 
-impl From<toml::ser::Error> for Error {
-    fn from(err: toml::ser::Error) -> Self {
+impl From<toml_edit::ser::Error> for Error {
+    fn from(err: toml_edit::ser::Error) -> Self {
         Self::Serializing(err.to_string())
     }
 }

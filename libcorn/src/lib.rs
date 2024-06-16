@@ -47,6 +47,10 @@ pub enum Value<'a> {
     /// true or false
     Boolean(bool),
     /// `null` literal.
+    ///
+    /// Takes an optional unit type as the `toml` crate
+    /// errors when encountering unit types,
+    /// but can handle `None` types.
     Null(Option<()>),
 }
 

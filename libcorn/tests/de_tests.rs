@@ -123,7 +123,7 @@ struct Compact {
     seven: CompactSeven,
     eight: Vec<String>,
     nine: Vec<bool>,
-    ten: Vec<()>,
+    ten: (u8, u8),
     eleven: Vec<Vec<u8>>,
     twelve: Vec<Empty>,
 }
@@ -323,6 +323,11 @@ struct NullUnit {
 struct NullUnitInner;
 
 #[derive(Deserialize, Debug, PartialEq)]
+struct NullInArray {
+    foo: Vec<Option<u8>>,
+}
+
+#[derive(Deserialize, Debug, PartialEq)]
 struct Object {
     foo: SubObject,
 }
@@ -357,6 +362,30 @@ struct ReadmeExample {
     private: bool,
     scripts: ReadmeExampleScripts,
     version: String,
+}
+
+#[derive(Deserialize, Debug, PartialEq)]
+struct QuotedKeys {
+    #[serde(rename = "foo.bar")]
+    foo_bar: u8,
+    #[serde(rename = "green.eggs")]
+    green_eggs: GreenEggs,
+    #[serde(rename = "with spaces")]
+    with_spaces: bool,
+    #[serde(rename = "escaped'quote")]
+    escaped_quote: bool,
+    #[serde(rename = "escaped=equals")]
+    escaped_equals: i8,
+}
+
+#[derive(Deserialize, Debug, PartialEq)]
+struct GreenEggs {
+    and: And,
+}
+
+#[derive(Deserialize, Debug, PartialEq)]
+struct And {
+    ham: String,
 }
 
 #[derive(Deserialize, Debug, PartialEq)]
@@ -432,9 +461,11 @@ generate_eq_tests!(
     (integer, Integer),
     (mixed_array, MixedArray),
     (null, Null),
+    (null_in_array, NullInArray),
     (object, Object),
     (object_in_array, ObjectInArray),
     (readme_example, ReadmeExample),
+    (quoted_keys, QuotedKeys),
     (string, String_),
     (string_interpolation, Basic),
     (value_after_table, ValueAfterTable),

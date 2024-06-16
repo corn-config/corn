@@ -42,7 +42,8 @@ macro_rules! generate_eq_tests {
                     let valid = fs::read_to_string(format!("../assets/outputs/toml/{}.toml", test_name)).unwrap().replace("\r", "");
 
                     let config = parse(input.as_str()).unwrap();
-                    let serialized = toml::to_string_pretty(&config).unwrap().replace("\r", "");
+                    // fall back to default as toml can fail due to no null
+                    let serialized = toml_edit::ser::to_string_pretty(&config).unwrap_or_default().replace("\r", "");
 
                     assert_eq!(serialized.trim(), valid.trim());
                 }
@@ -87,8 +88,10 @@ generate_eq_tests!(
     integer,
     mixed_array,
     null,
+    null_in_array,
     object,
     object_in_array,
+    quoted_keys,
     readme_example,
     spread,
     string,

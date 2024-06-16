@@ -6,5 +6,6 @@
     }
   },
   "with spaces": true,
-  "escaped'quote": false
+  "escaped'quote": false,
+  "escaped=equals": -3
 }

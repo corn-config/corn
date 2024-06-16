@@ -84,7 +84,7 @@ fn serialize(config: &Value, output_type: OutputType) -> Result<String, Error> {
     match output_type {
         OutputType::Json => serde_json::to_string_pretty(&config).map_err(Error::from),
         OutputType::Yaml => serde_yaml::to_string(&config).map_err(Error::from),
-        OutputType::Toml => toml::to_string_pretty(&config).map_err(Error::from),
+        OutputType::Toml => toml_edit::ser::to_string_pretty(&config).map_err(Error::from),
     }
 }
 
