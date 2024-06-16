@@ -4,4 +4,5 @@ green.eggs:
     ham: hello world
 with spaces: true
 escaped'quote: false
+escaped=equals: -3
 

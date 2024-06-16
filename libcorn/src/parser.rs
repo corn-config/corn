@@ -277,7 +277,7 @@ impl<'a> CornParser<'a> {
         }
 
         let child_obj = obj
-            .remove(part)
+            .shift_remove(part)
             .unwrap_or_else(|| Value::Object(IndexMap::new()));
 
         match child_obj {

@@ -9,7 +9,7 @@
 
     eight=["foo""bar"]
     nine=[truefalse]
-    ten=[nullnull]
+    ten=[1 2]
     eleven=[[][]]
     twelve=[{}{}]
 }
