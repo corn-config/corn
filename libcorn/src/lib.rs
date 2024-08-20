@@ -12,7 +12,6 @@ mod parser;
 
 mod de;
 #[cfg(any(
-    feature = "lua",
     feature = "lua51",
     feature = "lua52",
     feature = "lua53",
