@@ -23,13 +23,13 @@ name = "corn"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-pest = "2.7.10"
-pest_derive = "2.7.10"
+pest = "2.7.11"
+pest_derive = "2.7.11"
 cfg-if = "1.0.0"
-serde = { version = "1.0.203", features = ["derive"] }
-indexmap = { version = "2.2.6", features = ["serde"] }
-thiserror = "1.0.61"
-wasm-bindgen = { version = "0.2.92", optional = true }
+serde = { version = "1.0.208", features = ["derive"] }
+indexmap = { version = "2.4.0", features = ["serde"] }
+thiserror = "1.0.63"
+wasm-bindgen = { version = "0.2.93", optional = true }
 serde-wasm-bindgen = { version = "0.6.5", optional = true }
 console_error_panic_hook = { version = "0.1.7", optional = true }
 wee_alloc = { version = "0.4.5", optional = true }
@@ -40,12 +40,12 @@ criterion = { version = "0.5.1", features = ["html_reports"], optional = true }
 
 [dev-dependencies]
 paste = "1.0.15"
-wasm-bindgen-test = { version = "0.3.42" }
+wasm-bindgen-test = { version = "0.3.43" }
 # required for testing
-serde_json = "1.0.117"
+serde_json = "1.0.125"
 serde_yaml = "0.9.34"
-serde_bytes = "0.11.14"
-toml_edit = { version = "0.22.14", features = ["serde"] }
+serde_bytes = "0.11.15"
+toml_edit = { version = "0.22.20", features = ["serde"] }
 
 [[bench]]
 name = "serde"
