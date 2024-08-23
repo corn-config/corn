@@ -5,9 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [v0.10.0] - 2024-08-23
-### :memo: Documentation Changes
-- [`233bf74`](https://github.com/corn-config/corn/commit/233bf74d7a6665b992e679240998b3eb4986074b) - update CHANGELOG.md for v0.9.2 [skip ci] *(commit by [@JakeStanger](https://github.com/JakeStanger))*
-
+### :sparkles: New Features
+- [`2273ce7`](https://github.com/corn-config/corn/commit/2273ce77b819895022d62dec8a8446f9e0345260) - trim whitespace from multi-line strings *(commit by @JakeStanger)*
+- [`91b8d5c`](https://github.com/corn-config/corn/commit/91b8d5c976bd940cc59d8df250101ff9a544a8fe) - ability to quote keys to escape limitations 
 
 ## [v0.9.2] - 2023-09-14
 ### :bug: Bug Fixes
