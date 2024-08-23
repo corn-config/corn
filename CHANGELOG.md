@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.10.0] - 2024-08-23
+### :memo: Documentation Changes
+- [`233bf74`](https://github.com/corn-config/corn/commit/233bf74d7a6665b992e679240998b3eb4986074b) - update CHANGELOG.md for v0.9.2 [skip ci] *(commit by [@JakeStanger](https://github.com/JakeStanger))*
+
+
 ## [v0.9.2] - 2023-09-14
 ### :bug: Bug Fixes
 - [`d124160`](https://github.com/JakeStanger/corn/commit/d124160ca425cd071ab269a5d2baf48035476798) - outputted keys not in same order as input *(commit by [@JakeStanger](https://github.com/JakeStanger))*
@@ -110,3 +115,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [v0.9.0]: https://github.com/JakeStanger/corn/compare/v0.8.0...v0.9.0
 [v0.9.1]: https://github.com/JakeStanger/corn/compare/v0.9.0...v0.9.1
 [v0.9.2]: https://github.com/JakeStanger/corn/compare/v0.9.1...v0.9.2
+[v0.10.0]: https://github.com/corn-config/corn/compare/v0.9.2...v0.10.0
