@@ -9,7 +9,7 @@ categories = ["config"]
 keywords = ["configuration", "language", "pest", "peg", "cli"]
 
 [dependencies]
-libcorn = { version = "*", path = "../libcorn" }
+libcorn = { version = "0.10.0", path = "../libcorn" }
 clap = { version = "4.5.16", features = ["derive"] }
 colored = "2.1.0"
 serde = { version = "1.0.208", features = ["derive"] }
