@@ -2,7 +2,7 @@
 
 A simple and pain-free configuration language.
 
-Corn has been designed using inspiration from JSON and Nix to produce a language that's easy and intuitive to write, 
+[Corn](https://cornlang.dev) has been designed using inspiration from JSON and Nix to produce a language that's easy and intuitive to write, 
 good for config files, and has a feature-set small enough you can learn it in minutes. 
 It was born out of the following frustrations:
 
