@@ -1,3 +1,6 @@
+
+[![License](https://img.shields.io/github/license/corn-config/corn)](https://github.com/corn-config/corn/blob/master/LICENSE)
+
 # 🌽 Corn
 
 A simple and pain-free configuration language.
