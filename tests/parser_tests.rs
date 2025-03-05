@@ -11,9 +11,10 @@ macro_rules! generate_eq_tests {
                 #[test]
                 fn [<json_ $test_name>]() {
                     let test_name = stringify!($test_name);
+                    let root_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
 
-                    let input = fs::read_to_string(format!("../assets/inputs/{}.corn", test_name)).unwrap();
-                    let valid = fs::read_to_string(format!("../assets/outputs/json/{}.json", test_name)).unwrap().replace("\r", "");
+                    let input = fs::read_to_string(format!("{root_dir}/assets/inputs/{test_name}.corn")).unwrap();
+                    let valid = fs::read_to_string(format!("{root_dir}/assets/outputs/json/{test_name}.json")).unwrap().replace("\r", "");
 
                     let config = parse(input.as_str()).unwrap();
                     let serialized = serde_json::to_string_pretty(&config).unwrap().replace("\r", "");
@@ -24,9 +25,10 @@ macro_rules! generate_eq_tests {
                 #[test]
                 fn [<yaml_ $test_name>]() {
                     let test_name = stringify!($test_name);
+                    let root_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
 
-                    let input = fs::read_to_string(format!("../assets/inputs/{}.corn", test_name)).unwrap();
-                    let valid = fs::read_to_string(format!("../assets/outputs/yaml/{}.yml", test_name)).unwrap().replace("\r", "");
+                    let input = fs::read_to_string(format!("{root_dir}/assets/inputs/{test_name}.corn")).unwrap();
+                    let valid = fs::read_to_string(format!("{root_dir}/assets/outputs/yaml/{test_name}.yml")).unwrap().replace("\r", "");
 
                     let config = parse(input.as_str()).unwrap();
                     let serialized = serde_norway::to_string(&config).unwrap().replace("\r", "");
@@ -37,9 +39,10 @@ macro_rules! generate_eq_tests {
                 #[test]
                 fn [<toml_ $test_name>]() {
                     let test_name = stringify!($test_name);
+                    let root_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
 
-                    let input = fs::read_to_string(format!("../assets/inputs/{}.corn", test_name)).unwrap();
-                    let valid = fs::read_to_string(format!("../assets/outputs/toml/{}.toml", test_name)).unwrap().replace("\r", "");
+                    let input = fs::read_to_string(format!("{root_dir}/assets/inputs/{test_name}.corn")).unwrap();
+                    let valid = fs::read_to_string(format!("{root_dir}/assets/outputs/toml/{test_name}.toml")).unwrap().replace("\r", "");
 
                     let config = parse(input.as_str()).unwrap();
                     // fall back to default as toml can fail due to no null
@@ -59,8 +62,9 @@ macro_rules! generate_invalid_tests {
             #[test]
             fn $test_name() {
                 let test_name = stringify!($test_name);
+                let root_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
 
-                let input = fs::read_to_string(format!("../assets/inputs/{}.corn", test_name)).unwrap();
+                let input = fs::read_to_string(format!("{root_dir}/assets/inputs/{}.corn", test_name)).unwrap();
 
                 let config = parse(input.as_str());
                 assert!(config.is_err());

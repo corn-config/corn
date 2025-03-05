@@ -10,11 +10,12 @@ macro_rules! generate_eq_tests {
                 #[test]
                 fn $test_name() {
                     let test_name = stringify!($test_name);
+                    let root_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
 
-                    let input = fs::read_to_string(format!("../assets/inputs/{test_name}.corn")).unwrap();
+                    let input = fs::read_to_string(format!("{root_dir}/assets/inputs/{test_name}.corn")).unwrap();
                     let config = from_str::<$test_type>(&input).unwrap();
 
-                    let json_input = fs::read_to_string(format!("../assets/outputs/json/{test_name}.json")).unwrap();
+                    let json_input = fs::read_to_string(format!("{root_dir}/assets/outputs/json/{test_name}.json")).unwrap();
                     let json_config = serde_json::from_str(&json_input).unwrap();
 
                     assert_eq!(config, json_config);
@@ -477,12 +478,13 @@ generate_eq_tests!(
 #[test]
 fn basic_new_type_enum() {
     let test_name = "basic";
+    let root_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
 
-    let input = fs::read_to_string(format!("../assets/inputs/{test_name}.corn")).unwrap();
+    let input = fs::read_to_string(format!("{root_dir}/assets/inputs/{test_name}.corn")).unwrap();
     let config = from_str::<BasicNewTypeEnum>(&input).unwrap();
 
     let json_input =
-        fs::read_to_string(format!("../assets/outputs/json/{test_name}.json")).unwrap();
+        fs::read_to_string(format!("{root_dir}/assets/outputs/json/{test_name}.json")).unwrap();
     let json_config = serde_json::from_str(&json_input).unwrap();
 
     assert_eq!(config, json_config);
@@ -491,12 +493,13 @@ fn basic_new_type_enum() {
 #[test]
 fn basic_unit_enum() {
     let test_name = "basic";
+    let root_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
 
-    let input = fs::read_to_string(format!("../assets/inputs/{test_name}.corn")).unwrap();
+    let input = fs::read_to_string(format!("{root_dir}/assets/inputs/{test_name}.corn")).unwrap();
     let config = from_str::<BasicUnitEnum>(&input).unwrap();
 
     let json_input =
-        fs::read_to_string(format!("../assets/outputs/json/{test_name}.json")).unwrap();
+        fs::read_to_string(format!("{root_dir}/assets/outputs/json/{test_name}.json")).unwrap();
     let json_config = serde_json::from_str(&json_input).unwrap();
 
     assert_eq!(config, json_config);
@@ -505,12 +508,13 @@ fn basic_unit_enum() {
 #[test]
 fn basic_new_type() {
     let test_name = "basic";
+    let root_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
 
-    let input = fs::read_to_string(format!("../assets/inputs/{test_name}.corn")).unwrap();
+    let input = fs::read_to_string(format!("{root_dir}/assets/inputs/{test_name}.corn")).unwrap();
     let config = from_str::<BasicNewType>(&input).unwrap();
 
     let json_input =
-        fs::read_to_string(format!("../assets/outputs/json/{test_name}.json")).unwrap();
+        fs::read_to_string(format!("{root_dir}/assets/outputs/json/{test_name}.json")).unwrap();
     let json_config = serde_json::from_str(&json_input).unwrap();
 
     assert_eq!(config, json_config);
@@ -519,12 +523,13 @@ fn basic_new_type() {
 #[test]
 fn bytes() {
     let test_name = "basic";
+    let root_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
 
-    let input = fs::read_to_string(format!("../assets/inputs/{test_name}.corn")).unwrap();
+    let input = fs::read_to_string(format!("{root_dir}/assets/inputs/{test_name}.corn")).unwrap();
     let config = from_str::<Bytes>(&input).unwrap();
 
     let json_input =
-        fs::read_to_string(format!("../assets/outputs/json/{test_name}.json")).unwrap();
+        fs::read_to_string(format!("{root_dir}/assets/outputs/json/{test_name}.json")).unwrap();
     let json_config = serde_json::from_str(&json_input).unwrap();
 
     assert_eq!(config, json_config);
@@ -533,12 +538,13 @@ fn bytes() {
 #[test]
 fn chained_enum() {
     let test_name = "chained";
+    let root_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
 
-    let input = fs::read_to_string(format!("../assets/inputs/{test_name}.corn")).unwrap();
+    let input = fs::read_to_string(format!("{root_dir}/assets/inputs/{test_name}.corn")).unwrap();
     let config = from_str::<ChainedEnum>(&input).unwrap();
 
     let json_input =
-        fs::read_to_string(format!("../assets/outputs/json/{test_name}.json")).unwrap();
+        fs::read_to_string(format!("{root_dir}/assets/outputs/json/{test_name}.json")).unwrap();
     let json_config = serde_json::from_str(&json_input).unwrap();
 
     assert_eq!(config, json_config);
@@ -547,12 +553,13 @@ fn chained_enum() {
 #[test]
 fn mixed_array_enum() {
     let test_name = "mixed_array";
+    let root_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
 
-    let input = fs::read_to_string(format!("../assets/inputs/{test_name}.corn")).unwrap();
+    let input = fs::read_to_string(format!("{root_dir}/assets/inputs/{test_name}.corn")).unwrap();
     let config = from_str::<MixedArrayEnum>(&input).unwrap();
 
     let json_input =
-        fs::read_to_string(format!("../assets/outputs/json/{test_name}.json")).unwrap();
+        fs::read_to_string(format!("{root_dir}/assets/outputs/json/{test_name}.json")).unwrap();
     let json_config = serde_json::from_str(&json_input).unwrap();
 
     assert_eq!(config, json_config);
@@ -561,12 +568,13 @@ fn mixed_array_enum() {
 #[test]
 fn null_option() {
     let test_name = "null";
+    let root_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
 
-    let input = fs::read_to_string(format!("../assets/inputs/{test_name}.corn")).unwrap();
+    let input = fs::read_to_string(format!("{root_dir}/assets/inputs/{test_name}.corn")).unwrap();
     let config = from_str::<NullOption>(&input).unwrap();
 
     let json_input =
-        fs::read_to_string(format!("../assets/outputs/json/{test_name}.json")).unwrap();
+        fs::read_to_string(format!("{root_dir}/assets/outputs/json/{test_name}.json")).unwrap();
     let json_config = serde_json::from_str(&json_input).unwrap();
 
     assert_eq!(config, json_config);
@@ -575,12 +583,13 @@ fn null_option() {
 #[test]
 fn null_unit() {
     let test_name = "null";
+    let root_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
 
-    let input = fs::read_to_string(format!("../assets/inputs/{test_name}.corn")).unwrap();
+    let input = fs::read_to_string(format!("{root_dir}/assets/inputs/{test_name}.corn")).unwrap();
     let config = from_str::<NullUnit>(&input).unwrap();
 
     let json_input =
-        fs::read_to_string(format!("../assets/outputs/json/{test_name}.json")).unwrap();
+        fs::read_to_string(format!("{root_dir}/assets/outputs/json/{test_name}.json")).unwrap();
     let json_config = serde_json::from_str(&json_input).unwrap();
 
     assert_eq!(config, json_config);

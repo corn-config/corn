@@ -230,7 +230,6 @@ dependencies = [
  "clap",
  "colored",
  "libcorn",
- "pest",
  "serde",
  "serde_json",
  "serde_norway",

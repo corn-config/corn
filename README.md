@@ -2,9 +2,10 @@
 
 A simple and pain-free configuration language.
 
-[Corn](https://cornlang.dev) has been designed using inspiration from JSON and Nix to produce a language that's easy and intuitive to write, 
-good for config files, and has a feature-set small enough you can learn it in minutes. 
-It was born out of the following frustrations:
+[Corn](https://cornlang.dev) has been designed using inspiration from JSON and
+Nix to produce a language that's easy and intuitive to write, good for config
+files, and has a feature-set small enough you can learn it in minutes. It was
+born out of the following frustrations:
 
 - JSON is not a config language, despite how often people use it as one.
 - TOML is good for flat structures but gets ugly quickly with deeper objects.
@@ -17,8 +18,7 @@ It was born out of the following frustrations:
 
 ## Documentation
 
-[📖User guide](https://cornlang.dev/user-guide)
-|
+[📖User guide](https://cornlang.dev/user-guide) |
 [📝 Full specification](https://cornlang.dev/spec)
 
 </div>
@@ -58,6 +58,7 @@ let {
 
 ---
 
-Corn is available as libraries for Rust, Go, Lua, and JavaScript (via WASM). A CLI and web API are also available.
+Corn is available as libraries for Rust, Go, Lua, and JavaScript (via WASM). A
+CLI and web API are also available.
 
 Editor plugins are available for JetBrains IDEs, VS Code and Neovim.
