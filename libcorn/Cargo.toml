@@ -52,7 +52,7 @@ paste = "1.0.15"
 wasm-bindgen-test = { version = "0.3.50" }
 # required for testing
 serde_json = "1.0.140"
-serde_yaml = "0.9.34"
+serde_norway = "0.9.42"
 serde_bytes = "0.11.16"
 toml_edit = { version = "0.22.24", features = ["serde"] }
 

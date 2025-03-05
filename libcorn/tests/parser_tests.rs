@@ -29,7 +29,7 @@ macro_rules! generate_eq_tests {
                     let valid = fs::read_to_string(format!("../assets/outputs/yaml/{}.yml", test_name)).unwrap().replace("\r", "");
 
                     let config = parse(input.as_str()).unwrap();
-                    let serialized = serde_yaml::to_string(&config).unwrap().replace("\r", "");
+                    let serialized = serde_norway::to_string(&config).unwrap().replace("\r", "");
 
                     assert_eq!(serialized.trim(), valid.trim());
                 }
