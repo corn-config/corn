@@ -34,7 +34,7 @@ impl<'a> CornParser<'a> {
         }
     }
 
-    pub fn parse(mut self, object_block: Pair<'a, Rule>) -> Result<Value> {
+    pub fn parse(mut self, object_block: Pair<'a, Rule>) -> Result<Value<'a>> {
         if let Some(input_block) = self.input_block.take() {
             self.parse_assign_block(input_block)?;
         }
@@ -342,7 +342,6 @@ impl<'a> CornParser<'a> {
 ///
 /// Based on code from `indoc` crate:
 /// <https://github.com/dtolnay/indoc/blob/60b5fa29ba4f98b479713621a1f4ec96155caaba/src/unindent.rs#L15-L51>
-
 fn trim_multiline_string(string: &str) -> String {
     let ignore_first_line = string.starts_with('\n') || string.starts_with("\r\n");
 
