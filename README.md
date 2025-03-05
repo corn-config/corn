@@ -58,7 +58,7 @@ let {
 
 ---
 
-Corn is available as libraries for Rust, Go, Lua, and JavaScript (via WASM). A
-CLI and web API are also available.
+Corn is available as libraries for Rust, Go, Lua, and JavaScript (via WASM).\
+A CLI and web API are also available.
 
 Editor plugins are available for JetBrains IDEs, VS Code and Neovim.

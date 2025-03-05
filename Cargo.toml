@@ -41,7 +41,7 @@ name = "corn"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-# Core stuff
+# Core
 pest = "2.7.15"
 pest_derive = "2.7.15"
 serde = { version = "1.0.218", features = ["derive"] }
