@@ -1,8 +1,8 @@
 use crate::Value;
 use mlua::prelude::*;
 
-impl<'lua> IntoLua<'lua> for Value<'lua> {
-    fn into_lua(self, lua: &'lua Lua) -> LuaResult<LuaValue<'lua>> {
+impl IntoLua for Value<'_> {
+    fn into_lua(self, lua: &Lua) -> LuaResult<LuaValue> {
         lua.to_value(&self)
     }
 }

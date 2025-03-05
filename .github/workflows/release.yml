@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     tags:
-      - '*'
+      - "*"
 
 env:
   CARGO_TERM_COLOR: always
@@ -15,25 +15,21 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Install build deps
         run: sudo apt install jq
 
-      - name: Update Toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
+      - name: Setup rust
+        run: rustup toolchain install stable
 
       - name: Install wasm-pack
-        uses: jetli/wasm-pack-action@v0.3.0
-        with:
-          version: 'latest'
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: "20.x"
+          registry-url: "https://registry.npmjs.org"
 
       - name: Build WASM package
         run: scripts/build-wasm.sh
@@ -44,7 +40,7 @@ jobs:
         with:
           token: ${{ github.token }}
           tag: ${{ github.ref_name }}
-          excludeTypes: 'build,chore,style'
+          excludeTypes: "build,chore,style"
 
       - name: Create release
         uses: ncipollo/release-action@v1
@@ -59,11 +55,11 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           branch: master
-          commit_message: 'docs: update CHANGELOG.md for ${{ github.ref_name }} [skip ci]'
+          commit_message: "docs: update CHANGELOG.md for ${{ github.ref_name }} [skip ci]"
           file_pattern: CHANGELOG.md
 
       - name: Publish crates
-        uses: katyo/publish-crates@v1
+        uses: katyo/publish-crates@v2
         with:
           registry-token: ${{ secrets.CARGO_REGISTRY_TOKEN }}
           ignore-unpublished-changes: true

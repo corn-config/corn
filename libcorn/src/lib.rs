@@ -53,7 +53,7 @@ pub enum Value<'a> {
     Null(Option<()>),
 }
 
-impl<'a> Display for Value<'a> {
+impl Display for Value<'_> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
