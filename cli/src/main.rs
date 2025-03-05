@@ -1,12 +1,13 @@
 use corn::{parse, Value};
-use corn_cli::error::{print_err, Error, ExitCode};
 use std::io::Read;
 use std::process::exit;
 use std::{fs, io};
 
-use crate::Error::Corn;
 use clap::{Parser, ValueEnum};
 use colored::Colorize;
+
+mod error;
+use error::{print_err, Error, ExitCode};
 
 #[derive(ValueEnum, Clone, Copy, Debug)]
 enum OutputType {
@@ -51,7 +52,7 @@ fn main() {
                     Ok(serialized) => println!("{serialized}"),
                     Err(err) => handle_err(&err),
                 },
-                Err(err) => handle_err(&Corn(err)),
+                Err(err) => handle_err(&Error::Corn(err)),
             };
         }
         Err(err) => {
