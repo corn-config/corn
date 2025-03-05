@@ -77,7 +77,6 @@ jobs:
 
       - name: Wasm-Pack Test
         run: wasm-pack test --node
-        working-directory: libcorn
 
   build-lua:
     runs-on: ubuntu-latest
