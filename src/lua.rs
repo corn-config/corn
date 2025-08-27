@@ -1,14 +1,14 @@
 use crate::Value;
 use mlua::prelude::*;
 
-impl IntoLua for Value<'_> {
+impl IntoLua for Value {
     fn into_lua(self, lua: &Lua) -> LuaResult<LuaValue> {
         lua.to_value(&self)
     }
 }
 
 fn lua_parse(lua: &Lua, config: String) -> LuaResult<LuaValue> {
-    let res = crate::parse(&config);
+    let res = crate::from_str::<Value>(&config);
     match res {
         Ok(v) => Ok(lua.to_value(&v)?),
         Err(e) => Err(LuaError::RuntimeError(e.to_string())),

@@ -1,4 +1,4 @@
-use corn::{parse, Value};
+use corn::Value;
 use std::io::Read;
 use std::process::exit;
 use std::{fs, io};
@@ -47,7 +47,7 @@ fn main() {
         Ok(unparsed_file) => {
             let output_type = get_output_type(args.output_type);
 
-            match parse(&unparsed_file) {
+            match corn::from_str(&unparsed_file) {
                 Ok(config) => match serialize(&config, output_type) {
                     Ok(serialized) => println!("{serialized}"),
                     Err(err) => handle_err(&err),

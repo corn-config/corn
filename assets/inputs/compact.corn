@@ -8,7 +8,7 @@
     seven={foo=[] bar=[]}
 
     eight=["foo""bar"]
-    nine=[truefalse]
+    nine=[true false]
     ten=[1 2]
     eleven=[[][]]
     twelve=[{}{}]

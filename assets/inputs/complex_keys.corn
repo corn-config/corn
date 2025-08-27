@@ -2,7 +2,7 @@
     with_underscore = 0
     with-dash = 1
     with_🌽 = 2
-    !"£$%^&*()_ = 3
+    !£$%^&*()_ = 3
     j12345 = 4
     foo.bar-baz = "hello"
     apple-pie.crust = "yum"

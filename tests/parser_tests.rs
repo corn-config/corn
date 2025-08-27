@@ -1,6 +1,6 @@
 extern crate core;
 
-use corn::parse;
+use corn::Value;
 use paste::paste;
 use std::fs;
 
@@ -16,7 +16,7 @@ macro_rules! generate_eq_tests {
                     let input = fs::read_to_string(format!("{root_dir}/assets/inputs/{test_name}.corn")).unwrap();
                     let valid = fs::read_to_string(format!("{root_dir}/assets/outputs/json/{test_name}.json")).unwrap().replace("\r", "");
 
-                    let config = parse(input.as_str()).unwrap();
+                    let config: Value = corn::from_str(input.as_str()).unwrap();
                     let serialized = serde_json::to_string_pretty(&config).unwrap().replace("\r", "");
 
                     assert_eq!(serialized.trim(), valid.trim());
@@ -30,7 +30,7 @@ macro_rules! generate_eq_tests {
                     let input = fs::read_to_string(format!("{root_dir}/assets/inputs/{test_name}.corn")).unwrap();
                     let valid = fs::read_to_string(format!("{root_dir}/assets/outputs/yaml/{test_name}.yml")).unwrap().replace("\r", "");
 
-                    let config = parse(input.as_str()).unwrap();
+                    let config: Value = corn::from_str(input.as_str()).unwrap();
                     let serialized = serde_norway::to_string(&config).unwrap().replace("\r", "");
 
                     assert_eq!(serialized.trim(), valid.trim());
@@ -44,7 +44,7 @@ macro_rules! generate_eq_tests {
                     let input = fs::read_to_string(format!("{root_dir}/assets/inputs/{test_name}.corn")).unwrap();
                     let valid = fs::read_to_string(format!("{root_dir}/assets/outputs/toml/{test_name}.toml")).unwrap().replace("\r", "");
 
-                    let config = parse(input.as_str()).unwrap();
+                    let config: Value = corn::from_str(input.as_str()).unwrap();
                     // fall back to default as toml can fail due to no null
                     let serialized = toml_edit::ser::to_string_pretty(&config).unwrap_or_default().replace("\r", "");
 
@@ -66,7 +66,7 @@ macro_rules! generate_invalid_tests {
 
                 let input = fs::read_to_string(format!("{root_dir}/assets/inputs/{}.corn", test_name)).unwrap();
 
-                let config = parse(input.as_str());
+                let config = corn::from_str::<Value>(input.as_str());
                 assert!(config.is_err());
             }
         )+

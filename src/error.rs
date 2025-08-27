@@ -1,33 +1,64 @@
-use std::fmt::{Debug, Display};
-use thiserror::Error;
+use std::fmt::Display;
 
-use crate::Rule;
+/// A type alias for the standard Result type, defaulting to the crate's Error type.
+pub type Result<T, E = Error> = std::result::Result<T, E>;
 
-pub type Result<T> = std::result::Result<T, Error>;
-
-#[derive(Error, Debug)]
+/// Represents all possible errors that can occur when parsing or processing Corn data.
+#[derive(Debug)]
 pub enum Error {
-    #[error(transparent)]
-    Io(#[from] std::io::Error),
+    /// An I/O error that occurred during file operations.
+    Io(std::io::Error),
 
-    #[error(transparent)]
-    ParserError(#[from] Box<pest::error::Error<Rule>>),
+    /// Indicates an unexpected end of input during parsing.
+    Eof,
 
-    #[error("failed to resolve referenced input `{0}`")]
-    InputResolveError(String),
+    InvalidUtf8,
 
-    #[error("attempted to use dot-notation on non-object value at `{0}`")]
-    InvalidPathError(String),
+    /// Indicates that an unexpected token was encountered during parsing.
+    UnexpectedToken {
+        /// Description of what was expected at this position
+        expected: &'static str,
+        /// The actual byte value found
+        found: u8,
+        /// The position in the input where the unexpected token was found
+        index: usize,
+    },
 
-    #[error("attempted to spread a type that differs from its containing type at `{0}`")]
-    InvalidSpreadError(String),
-
-    #[error("attempted to interpolate a non-string type into a string at `{0}`")]
-    InvalidInterpolationError(String),
-
-    #[error("failed to deserialize input: {0}")]
+    /// This variant is typically used when handling serde-specific deserialization errors.
     DeserializationError(String),
 }
+
+impl Error {
+    /// Creates a new UnexpectedToken error with the provided details.
+    pub const fn unexpected_token(expected: &'static str, found: u8, index: usize) -> Self {
+        Self::UnexpectedToken {
+            expected,
+            found,
+            index,
+        }
+    }
+}
+
+impl Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Io(e) => e.fmt(f),
+            Self::Eof => write!(f, "Unexpected end of input"),
+            Self::InvalidUtf8 => todo!(),
+            Self::UnexpectedToken {
+                expected,
+                found,
+                index,
+            } => write!(
+                f,
+                "Unexpected Token {found} at index {index}, expected {expected}"
+            ),
+            Self::DeserializationError(s) => write!(f, "Failed to deserialize input: {s}"),
+        }
+    }
+}
+
+impl std::error::Error for Error {}
 
 impl serde::de::Error for Error {
     fn custom<T>(msg: T) -> Self
