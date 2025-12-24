@@ -1,35 +1,40 @@
-use std::fmt::{Debug, Display};
-use thiserror::Error;
+use alloc::string::{String, ToString};
+use core::fmt::{Display, Formatter};
 
-use crate::Rule;
+pub type Result<T, E = Error> = core::result::Result<T, E>;
 
-pub type Result<T> = std::result::Result<T, Error>;
-
-#[derive(Error, Debug)]
+#[derive(Debug)]
 pub enum Error {
-    #[error(transparent)]
-    Io(#[from] std::io::Error),
-
-    #[error(transparent)]
-    ParserError(#[from] Box<pest::error::Error<Rule>>),
-
-    #[error("failed to resolve referenced input `{0}`")]
     InputResolveError(String),
-
-    #[error("attempted to use dot-notation on non-object value at `{0}`")]
-    InvalidPathError(String),
-
-    #[error("attempted to spread a type that differs from its containing type at `{0}`")]
-    InvalidSpreadError(String),
-
-    #[error("attempted to interpolate a non-string type into a string at `{0}`")]
-    InvalidInterpolationError(String),
-
-    #[error("failed to deserialize input: {0}")]
+    InvalidSpreadError,
+    InvalidInterpolationError,
     DeserializationError(String),
+    ParseError(String),
 }
 
-impl serde::de::Error for Error {
+impl Display for Error {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::InputResolveError(input) => {
+                write!(f, "failed to resolve referenced input `{input}`")
+            }
+            Self::InvalidSpreadError => write!(
+                f,
+                "attempted to spread a type that differs from its containing type"
+            ),
+            Self::InvalidInterpolationError => write!(
+                f,
+                "attempted to interpolate a non-string type into a string"
+            ),
+            Self::DeserializationError(msg) => write!(f, "failed to deserialize input: {msg}"),
+            Self::ParseError(msg) => write!(f, "failed to parse input: {msg}"),
+        }
+    }
+}
+
+impl core::error::Error for Error {}
+
+impl serde_core::de::Error for Error {
     fn custom<T>(msg: T) -> Self
     where
         T: Display,

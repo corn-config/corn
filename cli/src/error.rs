@@ -1,5 +1,5 @@
 use colored::Colorize;
-use corn::error::Error as CornError;
+use corn::Error as CornError;
 use std::fmt::{Display, Formatter};
 use std::io;
 
@@ -20,12 +20,10 @@ pub trait ExitCode {
 impl ExitCode for CornError {
     fn get_exit_code(&self) -> i32 {
         match self {
-            CornError::Io(_) => 3,
-            CornError::ParserError(_) => 1,
+            CornError::ParseError(_) => 1,
             CornError::InputResolveError(_) => 2,
-            CornError::InvalidPathError(_) => 6,
-            CornError::InvalidSpreadError(_) => 7,
-            CornError::InvalidInterpolationError(_) => 8,
+            CornError::InvalidSpreadError => 7,
+            CornError::InvalidInterpolationError => 8,
             CornError::DeserializationError(_) => 5,
         }
     }

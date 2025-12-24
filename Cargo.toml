@@ -4,27 +4,32 @@ members = ["cli"]
 [package]
 name = "libcorn"
 version = "0.10.0"
-edition = "2021"
+edition = "2024"
 license = "MIT"
 description = "Parsing engine for Corn, a simple and pain-free configuration language."
 repository = "https://github.com/JakeStanger/corn"
 categories = ["config", "parsing"]
-keywords = ["configuration", "language", "wasm", "pest", "peg"]
-authors = ["Jake Stanger <mail@jakestanger.com>"]
+keywords = ["configuration", "language", "wasm", "peg"]
+authors = [
+    "Jake Stanger <mail@jstanger.dev>",
+    "Matilde Morrone <contact@morrone.dev>",
+]
 homepage = "https://cornlang.dev/"
 documentation = "https://docs.rs/libcorn"
 readme = "README.md"
 
 [features]
+default = ["std"]
+std = ["serde_core/std", "indexmap/std", "logos/std"]
+
 # WASM support
 wasm = [
     "dep:wasm-bindgen",
     "dep:serde-wasm-bindgen",
     "dep:console_error_panic_hook",
-    "dep:wee_alloc",
 ]
 
-# Lua version support
+# Lua support
 lua51 = ["dep:mlua", "mlua/lua51"]
 lua52 = ["dep:mlua", "mlua/lua52"]
 lua53 = ["dep:mlua", "mlua/lua53"]
@@ -32,56 +37,56 @@ lua54 = ["dep:mlua", "mlua/lua54"]
 luajit = ["dep:mlua", "mlua/luajit"]
 luajit52 = ["dep:mlua", "mlua/luajit52"]
 
-# Internal features
-bench = ["dep:criterion"]
-
 [lib]
 name = "corn"
 crate-type = ["cdylib", "rlib"]
 
-[dependencies]
-# Core
-pest = "2.7.15"
-pest_derive = "2.7.15"
-serde = { version = "1.0.218", features = ["derive"] }
-indexmap = { version = "2.7.1", features = ["serde"] }
-
-# Error handling
-thiserror = "2.0.12"
-
-# Utilities
-cfg-if = "1.0.0"
-
-# WASM support (optional)
-wasm-bindgen = { version = "0.2.100", optional = true }
-serde-wasm-bindgen = { version = "0.6.5", optional = true }
-console_error_panic_hook = { version = "0.1.7", optional = true }
-wee_alloc = { version = "0.4.5", optional = true }
-
-# Lua support (optional)
-mlua = { version = "0.10.3", features = [
-    "module",
-    "macros",
-    "serialize",
-], optional = true }
-
-# Benchmarking (optional)
-criterion = { version = "0.5.1", features = ["html_reports"], optional = true }
-
-[dev-dependencies]
-paste = "1.0.15"
-wasm-bindgen-test = { version = "0.3.50" }
-serde_json = "1.0.140"
-serde_norway = "0.9.42"
-serde_bytes = "0.11.16"
-toml_edit = { version = "0.22.24", features = ["serde"] }
+[[test]]
+name = "test_suite"
+harness = false
 
 [profile.release]
 lto = true
 codegen-units = 1
 strip = true
 
-[[bench]]
-name = "serde"
-harness = false
-required-features = ["bench"]
+[dependencies]
+# Core
+serde_core = { version = "1.0.228", default-features = false, features = [
+    "alloc",
+] }
+indexmap = { version = "2.12.1", features = [
+    "serde",
+], default-features = false }
+logos = { version = "0.16.0", default-features = false, features = [
+    "export_derive",
+] }
+lalrpop-util = { version = "0.22.2", features = ["lexer"] }
+itoa = "1.0.16"
+hashbrown = "0.16.1"
+
+# WASM support (optional)
+wasm-bindgen = { version = "0.2.106", optional = true }
+serde-wasm-bindgen = { version = "0.6.5", optional = true }
+console_error_panic_hook = { version = "0.1.7", optional = true }
+
+# Lua support (optional)
+mlua = { version = "0.11.5", features = [
+    "module",
+    "macros",
+    "serialize",
+], optional = true }
+
+[dev-dependencies]
+wasm-bindgen-test = { version = "0.3.56" }
+serde_json = "1.0.147"
+datatest-stable = "0.3.3"
+
+[build-dependencies]
+lalrpop = "0.22.2"
+
+[package.metadata.wasm-pack.profile.profiling]
+wasm-opt = ['-O', '--enable-bulk-memory']
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = ['-O', '--enable-bulk-memory']

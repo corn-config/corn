@@ -1,8 +1,8 @@
 #![allow(dead_code)]
 
 use serde_wasm_bindgen::to_value;
-use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsValue;
+use wasm_bindgen::prelude::*;
 
 #[cfg(test)]
 use wasm_bindgen_test::*;

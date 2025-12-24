@@ -1,0 +1,89 @@
+use crate::ast::{Root, Entry, Object, Inputs, PairOrSpread, ChainedKey, EntryOrSpread};
+use crate::lexer::{LexicalError, Token, StringPart};
+use crate::Integer;
+use alloc::vec::Vec;
+use alloc::vec;
+
+grammar<'input>(input: &'input str);
+
+extern {
+    type Location = usize;
+    type Error = LexicalError;
+
+    enum Token<'input> {
+      "let" => Token::Let,
+      "in" => Token::In,
+      "null" => Token::Null,
+      "=" => Token::Equals,
+      "{" => Token::OpenBrace,
+      "}" => Token::CloseBrace,
+      "[" => Token::OpenBracket,
+      "]" => Token::CloseBracket,
+      "." => Token::Chain,
+      ".." => Token::Spread,
+      "literal" => Token::Literal(<Vec<StringPart<'input>>>),
+      "int" => Token::Integer(<Integer>),
+      "float" => Token::Float(<f64>),
+      "bool" => Token::Boolean(<bool>),
+      "input" => Token::InputName(<&'input str>),
+      "key" => Token::Key(<&'input str>),
+    }
+}
+
+pub Root: Root<'input> = {
+    <inputs:LetBlock?> <object:Object> => {
+        Root {
+            inputs: inputs.unwrap_or_default(),
+            object,
+        }
+    }
+}
+
+LetBlock: Inputs<'input> = {
+    "let" "{" <inputs:(<InputDeclaration>)*> "}" "in" => inputs.into_iter().collect()
+};
+
+InputDeclaration: (&'input str, Entry<'input>) = {
+    <name:"input"> "=" <entry:Entry> => (name, entry),
+};
+
+Entry: Entry<'input> = {
+    "literal" => Entry::String(<>),
+    "int" => Entry::Integer(<>),
+    "float" => Entry::Float(<>),
+    "bool" => Entry::Boolean(<>),
+    Object => Entry::Object(<>),
+    Array => Entry::Array(<>),
+    "null" => Entry::Null,
+    "input" => Entry::Input(<>),
+}
+
+Object: Object<'input> = {
+    "{" <pairs:(<Pair>)*> "}" => {
+        Object {
+            pairs,
+        }
+    }
+};
+
+Pair: PairOrSpread<'input> = {
+    <k:KeyPath> "=" <v:Entry> => PairOrSpread::Pair(k, v),
+    ".." <name:"input"> => PairOrSpread::Spread(name),
+};
+
+KeyPath: ChainedKey<'input> = {
+    <first:"key"> <rest:("." <"key">)*> => {
+        ChainedKey {
+            segments: [vec![first], rest].concat()
+        }
+    }
+};
+
+Array: Vec<EntryOrSpread<'input>> = {
+    "[" <entries:ArrayEntry*> "]" => entries,
+};
+
+ArrayEntry: EntryOrSpread<'input> = {
+    Entry => EntryOrSpread::Entry(<>),
+    ".." <name:"input"> => EntryOrSpread::Spread(name),
+};

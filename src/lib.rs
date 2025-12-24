@@ -1,14 +1,11 @@
-use indexmap::IndexMap;
-use serde::Serialize;
-use std::borrow::Cow;
-use std::collections::HashMap;
-use std::fmt::{Display, Formatter};
+#![cfg_attr(not(feature = "std"), no_std)]
 
-pub use crate::de::{from_slice, from_str};
-pub use crate::parser::{parse, Rule};
+extern crate alloc;
 
-pub mod error;
-mod parser;
+#[cfg(feature = "std")]
+pub(crate) use indexmap::IndexMap;
+#[cfg(not(feature = "std"))]
+pub(crate) type IndexMap<K, V, S = hashbrown::DefaultHashBuilder> = indexmap::IndexMap<K, V, S>;
 
 mod de;
 #[cfg(any(
@@ -23,50 +20,13 @@ mod lua;
 #[cfg(feature = "wasm")]
 mod wasm;
 
-/// A map of input names and values.
-/// The names include their `$` prefix.
-pub type Inputs<'a> = HashMap<&'a str, Value<'a>>;
+mod error;
+pub(crate) mod value;
 
-/// A map of keys to their values.
-pub type Object<'a> = IndexMap<Cow<'a, str>, Value<'a>>;
+pub mod ast;
+pub mod lexer;
+lalrpop_util::lalrpop_mod!(pub parser, "/corn.rs");
 
-#[derive(Serialize, Debug, Clone)]
-#[serde(untagged)]
-pub enum Value<'a> {
-    /// Key/value map. Values can be mixed types.
-    Object(Object<'a>),
-    /// Array of values, can be mixed types.
-    Array(Vec<Value<'a>>),
-    /// UTF-8 string
-    String(Cow<'a, str>),
-    /// 64-bit signed integer.
-    Integer(i64),
-    /// 64-bit (double precision) floating point number.
-    Float(f64),
-    /// true or false
-    Boolean(bool),
-    /// `null` literal.
-    ///
-    /// Takes an optional unit type as the `toml` crate
-    /// errors when encountering unit types,
-    /// but can handle `None` types.
-    Null(Option<()>),
-}
-
-impl Display for Value<'_> {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "{}",
-            match self {
-                Value::Object(_) => "object",
-                Value::Array(_) => "array",
-                Value::String(_) => "string",
-                Value::Integer(_) => "integer",
-                Value::Float(_) => "float",
-                Value::Boolean(_) => "boolean",
-                Value::Null(_) => "null",
-            }
-        )
-    }
-}
+pub use de::{Deserializer, from_str, parse};
+pub use error::{Error, Result};
+pub use value::{BorrowedObject, BorrowedValue, Integer, Object, Value};

@@ -30,7 +30,7 @@ jobs:
         run: cargo fmt --check --all
 
       - name: Check Clippy
-        run: cargo clippy --workspace --all-targets --features wasm,lua54,bench
+        run: cargo clippy --workspace --all-targets --features wasm,lua54
 
   build:
     runs-on: ${{ matrix.os }}
@@ -76,7 +76,7 @@ jobs:
         run: cargo build --features wasm
 
       - name: Wasm-Pack Test
-        run: wasm-pack test --node
+        run: wasm-pack test --node --features wasm
 
   build-lua:
     runs-on: ubuntu-latest

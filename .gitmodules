@@ -1,0 +1,3 @@
+[submodule "test-suite"]
+	path = test-suite
+	url = https://github.com/corn-config/test-suite.git

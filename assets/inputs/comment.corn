@@ -1,4 +1,0 @@
-{
-    // single line comment
-    foo = "bar" // mixed line comment
-}
