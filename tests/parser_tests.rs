@@ -31,6 +31,7 @@ macro_rules! generate_eq_tests {
                     let valid = fs::read_to_string(format!("{root_dir}/assets/outputs/yaml/{test_name}.yml")).unwrap().replace("\r", "");
 
                     let config = parse(input.as_str()).unwrap();
+
                     let serialized = serde_norway::to_string(&config).unwrap().replace("\r", "");
 
                     assert_eq!(serialized.trim(), valid.trim());
@@ -45,6 +46,7 @@ macro_rules! generate_eq_tests {
                     let valid = fs::read_to_string(format!("{root_dir}/assets/outputs/toml/{test_name}.toml")).unwrap().replace("\r", "");
 
                     let config = parse(input.as_str()).unwrap();
+
                     // fall back to default as toml can fail due to no null
                     let serialized = toml_edit::ser::to_string_pretty(&config).unwrap_or_default().replace("\r", "");
 

@@ -33,7 +33,7 @@ path = ${
 }
 
 path_seg = _{
-    quoted_path_seg | regular_path_seg
+    integer | quoted_path_seg | regular_path_seg
 }
 
 quoted_path_seg = ${ "'" ~ quoted_path_val ~ "'" }

@@ -1,6 +1,7 @@
 use corn::from_str;
 use paste::paste;
 use serde::Deserialize;
+use std::collections::HashMap;
 use std::fs;
 
 macro_rules! generate_eq_tests {
@@ -329,6 +330,11 @@ struct NullInArray {
 }
 
 #[derive(Deserialize, Debug, PartialEq)]
+struct NumericKeys {
+    foo: HashMap<u32, String>,
+}
+
+#[derive(Deserialize, Debug, PartialEq)]
 struct Object {
     foo: SubObject,
 }
@@ -463,6 +469,7 @@ generate_eq_tests!(
     (mixed_array, MixedArray),
     (null, Null),
     (null_in_array, NullInArray),
+    (numeric_keys, NumericKeys),
     (object, Object),
     (object_in_array, ObjectInArray),
     (readme_example, ReadmeExample),
