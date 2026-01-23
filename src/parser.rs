@@ -8,7 +8,7 @@ use pest::iterators::Pair;
 use pest::Parser;
 
 use crate::error::{Error, Result};
-use crate::{Inputs, Object, Value};
+use crate::{Inputs, Key, Object, Value};
 
 #[derive(pest_derive::Parser)]
 #[grammar = "grammar.pest"]
@@ -121,7 +121,7 @@ impl<'a> CornParser<'a> {
                     }
                 }
                 _ => unreachable!(),
-            };
+            }
         }
 
         let full_string = if full_string.contains('\n') {
@@ -184,7 +184,7 @@ impl<'a> CornParser<'a> {
                     }
                 }
                 _ => arr.push(self.parse_value(pair)?),
-            };
+            }
         }
 
         Ok(arr)
@@ -240,17 +240,18 @@ impl<'a> CornParser<'a> {
         Ok(obj)
     }
 
-    fn parse_path(path: Pair<Rule>) -> Vec<Cow<str>> {
+    fn parse_path(path: Pair<Rule>) -> Vec<Key> {
         path.into_inner()
             .map(|pair| match pair.as_rule() {
-                Rule::regular_path_seg => Cow::Borrowed(pair.as_str()),
-                Rule::quoted_path_seg => Cow::Owned(
+                Rule::regular_path_seg => Key::String(Cow::Borrowed(pair.as_str())),
+                Rule::quoted_path_seg => Key::String(Cow::Owned(
                     pair.into_inner()
                         .next()
                         .expect("quoted paths should contain an inner value")
                         .as_str()
                         .replace('\\', ""),
-                ),
+                )),
+                Rule::integer => Key::Integer(Self::parse_integer(pair)),
                 _ => unreachable!(),
             })
             .collect::<Vec<_>>()
@@ -262,11 +263,7 @@ impl<'a> CornParser<'a> {
     /// for example `foo.bar` is represented as `["foo", "bar"]`.
     ///
     /// Objects are created up to the required depth recursively.
-    fn add_at_path(
-        mut obj: Object<'a>,
-        path: &[Cow<'a, str>],
-        value: Value<'a>,
-    ) -> Result<Object<'a>> {
+    fn add_at_path(mut obj: Object<'a>, path: &[Key<'a>], value: Value<'a>) -> Result<Object<'a>> {
         let (part, path_rest) = path
             .split_first()
             .expect("paths should contain at least 1 segment");
@@ -289,7 +286,12 @@ impl<'a> CornParser<'a> {
 
                 Ok(obj)
             }
-            _ => Err(Error::InvalidPathError(path.join("."))),
+            _ => Err(Error::InvalidPathError(
+                path.iter()
+                    .map(ToString::to_string)
+                    .collect::<Vec<_>>()
+                    .join("."),
+            )),
         }
     }
 
@@ -400,7 +402,7 @@ fn trim_multiline_string(string: &str) -> String {
 /// If the internal AST parser produces a tree in an invalid structure,
 /// the function will panic.
 /// This indicates a severe error in the library and should never occur.
-pub fn parse(file: &str) -> Result<Value> {
+pub fn parse(file: &str) -> Result<Value<'_>> {
     let rules = AstParser::parse(Rule::config, file);
 
     match rules {

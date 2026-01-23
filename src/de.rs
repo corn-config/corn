@@ -370,7 +370,7 @@ impl<'de> Map<'de> {
             Value::Object(values) => Self {
                 values: values
                     .into_iter()
-                    .flat_map(|(key, value)| vec![Value::String(key), value])
+                    .flat_map(|(key, value)| vec![key.into(), value])
                     .collect(),
             },
             _ => unreachable!(),
@@ -474,7 +474,7 @@ impl<'de> EnumAccess<'de> for Enum<'de> {
             Value::Object(obj) => {
                 let first_pair = obj.into_iter().next();
                 if let Some(first_pair) = first_pair {
-                    let value = Value::String(first_pair.0);
+                    let value = first_pair.0.into();
                     let tag = seed.deserialize(&mut Deserializer::from_value(value))?;
                     Ok((tag, Variant::new(Some(first_pair.1))))
                 } else {
