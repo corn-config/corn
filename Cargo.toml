@@ -49,9 +49,6 @@ indexmap = { version = "2.7.1", features = ["serde"] }
 # Error handling
 thiserror = "2.0.12"
 
-# Utilities
-cfg-if = "1.0.0"
-
 # WASM support (optional)
 wasm-bindgen = { version = "0.2.100", optional = true }
 serde-wasm-bindgen = { version = "0.6.5", optional = true }
@@ -59,14 +56,14 @@ console_error_panic_hook = { version = "0.1.7", optional = true }
 wee_alloc = { version = "0.4.5", optional = true }
 
 # Lua support (optional)
-mlua = { version = "0.10.3", features = [
+mlua = { version = "0.11.5", features = [
     "module",
     "macros",
     "serialize",
 ], optional = true }
 
 # Benchmarking (optional)
-criterion = { version = "0.5.1", features = ["html_reports"], optional = true }
+criterion = { version = "0.8.1", features = ["html_reports"], optional = true }
 
 [dev-dependencies]
 paste = "1.0.15"
@@ -74,7 +71,7 @@ wasm-bindgen-test = { version = "0.3.50" }
 serde_json = "1.0.140"
 serde_norway = "0.9.42"
 serde_bytes = "0.11.16"
-toml_edit = { version = "0.22.24", features = ["serde"] }
+toml_edit = { version = "0.24.0", features = ["serde"] }
 
 [profile.release]
 lto = true
