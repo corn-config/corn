@@ -3,7 +3,7 @@ members = ["cli"]
 
 [package]
 name = "libcorn"
-version = "0.10.0"
+version = "0.10.1"
 edition = "2021"
 license = "MIT"
 description = "Parsing engine for Corn, a simple and pain-free configuration language."

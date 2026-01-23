@@ -246,7 +246,7 @@ dependencies = [
 
 [[package]]
 name = "corn-cli"
-version = "0.10.0"
+version = "0.10.1"
 dependencies = [
  "clap",
  "colored",
@@ -498,7 +498,7 @@ checksum = "bcc35a38544a891a5f7c865aca548a982ccb3b8650a5b06d0fd33a10283c56fc"
 
 [[package]]
 name = "libcorn"
-version = "0.10.0"
+version = "0.10.1"
 dependencies = [
  "console_error_panic_hook",
  "criterion",
